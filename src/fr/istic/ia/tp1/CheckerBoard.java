@@ -129,7 +129,7 @@ public class CheckerBoard {
 	 * @param pawnID
 	 * @return A string representing the given pawnID
 	 */
-	String pawnReresentation(byte pawnID) {
+	String pawnRepresentation(byte pawnID) {
 		switch (pawnID) {
 		case BLACK_CHECKER:	return " x";
 		case BLACK_KING:	return " X";
@@ -194,7 +194,7 @@ public class CheckerBoard {
 		for (int y=size; y>=-1; --y) {
 			str += boardLineFormatString(y, (Integer i) -> String.format("%2d", i)) 
 				+ "   "
-				+ boardLineFormatString(y, (Integer i) -> pawnReresentation(get(i)))
+				+ boardLineFormatString(y, (Integer i) -> pawnRepresentation(get(i)))
 				+ "\n";
 		}
 		return str;

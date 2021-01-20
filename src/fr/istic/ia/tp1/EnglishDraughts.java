@@ -142,9 +142,7 @@ public class EnglishDraughts extends Game {
 	 * @return
 	 */
 	boolean isEmpty(int square) {
-		//
-		// TODO isEmpty
-		//
+		return board.isEmpty(square);
 	}
 	
 	/** 
@@ -153,9 +151,7 @@ public class EnglishDraughts extends Game {
 	 * @return
 	 */
 	boolean isAdversary(int square) {
-		//
-		// TODO isAdversary
-		//
+		return false;
 	}
 	
 	/** 

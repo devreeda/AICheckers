@@ -151,7 +151,7 @@ public class EnglishDraughts extends Game {
 	 * @return
 	 */
 	boolean isAdversary(int square) {
-		if (playerId == PlayerId.ONE) {
+		if (playerId.equals(PlayerId.ONE)) {
 			return board.isBlack(square);
 		} else {
 			return board.isWhite(square);
@@ -164,7 +164,7 @@ public class EnglishDraughts extends Game {
 	 * @return
 	 */
 	boolean isMine(int square) {
-		if (playerId == PlayerId.ONE) {
+		if (playerId.equals(PlayerId.ONE)) {
 			return board.isWhite(square);
 		} else {
 			return board.isBlack(square);
@@ -176,9 +176,12 @@ public class EnglishDraughts extends Game {
 	 * @return The list of current player pawn positions
 	 */
 	ArrayList<Integer> myPawns() {
-		//
-		// TODO myPawns
-		//
+		List<Integer> pawns = new ArrayList<Integer>();
+		if (playerId.equals(PlayerId.ONE)) {
+			return board.getWhitePawns();
+		} else {
+			return board.getBlackPawns();
+		}
 	}
 	
 	

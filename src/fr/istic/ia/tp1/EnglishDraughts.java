@@ -144,25 +144,31 @@ public class EnglishDraughts extends Game {
 	boolean isEmpty(int square) {
 		return board.isEmpty(square);
 	}
-	
+	//FIXME
 	/** 
 	 * Check if a tile is owned by adversary
 	 * @param square Tile number
 	 * @return
 	 */
 	boolean isAdversary(int square) {
-		return false;
+		if (playerId == PlayerId.ONE) {
+			return board.isBlack(square);
+		} else {
+			return board.isWhite(square);
+		}
 	}
-	
+	//FIXME
 	/** 
 	 * Check if a tile is owned by the current player
 	 * @param square Tile number
 	 * @return
 	 */
 	boolean isMine(int square) {
-		//
-		// TODO isMine
-		//
+		if (playerId == PlayerId.ONE) {
+			return board.isWhite(square);
+		} else {
+			return board.isBlack(square);
+		}
 	}
 	
 	/** 

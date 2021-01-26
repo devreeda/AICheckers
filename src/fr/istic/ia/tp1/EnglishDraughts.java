@@ -177,7 +177,90 @@ public class EnglishDraughts extends Game {
 	}
 
 	public List<Move> possibleCaptureMoves() {
-		return null;
+		List<Integer> myPawns = this.myPawns();
+		List<Move> possibleMoves = new ArrayList<Move>();
+
+		// Pour chaque pion
+			// si le coin superieur gauche est occupé par un pion adverse et que le coin superieur gauche de celui ci est vide
+			// ou si le coin superieur droit est occupé par un pion adverse et que le coin superieur droit de celui ci est vide
+				// ajouter le move de prise à la list des possible capture moves
+
+
+		for (Integer pawn : myPawns) {
+			// check if the player is white so that it goes to the right direction
+			if (playerId.equals(PlayerId.ONE)) { //White
+				int upLeft = board.neighborUpLeft(pawn);
+				int upRight = board.neighborUpRight(pawn);
+				//check if the upleft neighbour is black and that the pawn can take it
+				if (board.isBlack(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
+					DraughtsMove move = new DraughtsMove();
+					move.add(pawn);
+					move.add(board.neighborUpLeft(upLeft));
+					possibleMoves.add(move);
+				}
+				//check if the upright neighbour is black and that the pawn can take it
+				if (board.isBlack(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
+					DraughtsMove move = new DraughtsMove();
+					move.add(pawn);
+					move.add(board.neighborUpLeft(upRight));
+					possibleMoves.add(move);
+				}
+				// if the pawn is a king, it can also take from the other direction
+				if (board.isKing(pawn)) {
+					int downLeft = board.neighborDownLeft(pawn);
+					int downRight = board.neighborDownRight(pawn);
+
+					if (board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+						DraughtsMove move = new DraughtsMove();
+						move.add(pawn);
+						move.add(board.neighborUpLeft(downLeft));
+						possibleMoves.add(move);
+					}
+					if (board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+						DraughtsMove move = new DraughtsMove();
+						move.add(pawn);
+						move.add(board.neighborUpLeft(downRight));
+						possibleMoves.add(move);
+					}
+				}
+			}
+			// check if the player is black so that it goes to the right direction
+			if (playerId.equals(PlayerId.TWO)) {
+				int downLeft = board.neighborDownLeft(pawn);
+				int downRight = board.neighborDownRight(pawn);
+
+				if (board.isWhite(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+					DraughtsMove move = new DraughtsMove();
+					move.add(pawn);
+					move.add(board.neighborUpLeft(downLeft));
+					possibleMoves.add(move);
+				}
+				if (board.isWhite(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+					DraughtsMove move = new DraughtsMove();
+					move.add(pawn);
+					move.add(board.neighborUpLeft(downRight));
+					possibleMoves.add(move);
+				}
+
+				if (board.isKing(pawn)) {
+					int upLeft = board.neighborUpLeft(pawn);
+					int upRight = board.neighborUpRight(pawn);
+					if (board.isWhite(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
+						DraughtsMove move = new DraughtsMove();
+						move.add(pawn);
+						move.add(board.neighborUpLeft(upLeft));
+						possibleMoves.add(move);
+					}
+					if (board.isWhite(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
+						DraughtsMove move = new DraughtsMove();
+						move.add(pawn);
+						move.add(board.neighborUpLeft(upRight));
+						possibleMoves.add(move);
+					}
+				}
+			}
+		}
+		return possibleMoves;
 	}
 
 
@@ -199,13 +282,14 @@ public class EnglishDraughts extends Game {
 		//
 		ArrayList<Move> moves = new ArrayList<>();
 		moves.addAll(possibleMovesWithoutCapture());
+		moves.addAll(possibleCaptureMoves());
 		return moves;
 	}
 
 	public ArrayList<Move> possibleMovesWithoutCapture(){
 		ArrayList<Move> moves = new ArrayList<>();
 		ArrayList<Integer> myPawns = myPawns();
-		//Les pions sont blanc
+		//Les pions sont blancs
 		if(playerId.equals(PlayerId.ONE)){ //WHITE
 			for(int i = 0; i< myPawns.size(); i++) {
 				int current = myPawns.get(i);

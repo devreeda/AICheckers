@@ -176,15 +176,18 @@ public class EnglishDraughts extends Game {
 	 * @return The list of current player pawn positions
 	 */
 	ArrayList<Integer> myPawns() {
-		List<Integer> pawns = new ArrayList<Integer>();
 		if (playerId.equals(PlayerId.ONE)) {
 			return board.getWhitePawns();
 		} else {
 			return board.getBlackPawns();
 		}
 	}
-	
-	
+
+	public List<Move> possibleCaptureMoves() {
+		return null;
+	}
+
+
 	/**
 	 * Generate the list of possible moves
 	 * - first check moves with captures

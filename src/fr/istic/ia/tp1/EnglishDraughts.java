@@ -1,15 +1,8 @@
 package fr.istic.ia.tp1;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-
-import fr.istic.ia.tp1.Game.PlayerId;
 
 /**
  * Implementation of the English Draughts game.
@@ -201,7 +194,88 @@ public class EnglishDraughts extends Game {
 		//    Use recursive calls to explore all multiple capture possibilities
 		// - one function that returns the displacement moves from a given position (without capture)
 		//
-		ArrayList<Move> moves = new ArrayList<Move>();
+		ArrayList<Move> moves = new ArrayList<>();
+		moves.addAll(possibleMovesWithoutCapture());
+		return moves;
+	}
+
+	public ArrayList<Move> possibleMovesWithoutCapture(){
+		ArrayList<Move> moves = new ArrayList<>();
+		ArrayList<Integer> myPawns = myPawns();
+		//Les pions sont blanc
+		if(playerId.equals(PlayerId.ONE)){ //WHITE
+			for(int i = 0; i< myPawns.size(); i++) {
+				int current = myPawns.get(i);
+					int upLeft = board.neighborUpLeft(current);
+					int upRight = board.neighborUpRight(current);
+					if (upLeft != 0 && board.isEmpty(upLeft)) {
+						DraughtsMove move1 = new DraughtsMove();
+						move1.add(current);
+						move1.add(upLeft);
+						moves.add(move1);
+					}
+					if (upRight != 0 && board.isEmpty(upRight)) {
+						DraughtsMove move1 = new DraughtsMove();
+						move1.add(current);
+						move1.add(upRight);
+						moves.add(move1);
+					}
+					if (board.isKing(current)) {//WhiteKing
+						int downLeft = board.neighborDownLeft(current);
+						int downRight = board.neighborDownRight(current);
+						if (upRight != 0 && board.isEmpty(downLeft)) {
+							DraughtsMove move1 = new DraughtsMove();
+							move1.add(current);
+							move1.add(downLeft);
+							moves.add( move1);
+						}
+						if (upRight != 0 && board.isEmpty(downRight)) {
+							DraughtsMove move1 = new DraughtsMove();
+							move1.add(current);
+							move1.add(downRight);
+							moves.add( move1);
+						}
+				}
+			}
+		}
+		else { //BLACK
+			for(int i = 0; i< myPawns.size(); i++) {
+				int current = myPawns.get(i);
+				int downLeft = board.neighborDownLeft(current);
+				int downRight = board.neighborDownRight(current);
+				if (downLeft != 0 && board.isEmpty(downLeft)) {
+					DraughtsMove move1 = new DraughtsMove();
+					move1.add(current);
+					move1.add(downLeft);
+					moves.add( move1);
+				}
+				if (downRight != 0 && board.isEmpty(downRight)) {
+					DraughtsMove move1 = new DraughtsMove();
+					move1.add(current);
+					move1.add(downRight);
+					moves.add(move1);
+				}
+				if (board.isKing(current)) {//WhiteKing
+					int upLeft = board.neighborUpLeft(current);
+					int upRight = board.neighborUpRight(current);
+					if (upLeft != 0 && board.isEmpty(upLeft)) {
+						DraughtsMove move1 = new DraughtsMove();
+						move1.add(current);
+						move1.add(upLeft);
+						moves.add(move1);
+					}
+					if (upRight != 0 && board.isEmpty(upRight)) {
+						DraughtsMove move1 = new DraughtsMove();
+						move1.add(current);
+						move1.add(upRight);
+						moves.add(move1);
+					}
+				}
+			}
+
+		}
+
+
 		return moves;
 	}
 

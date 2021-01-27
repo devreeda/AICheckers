@@ -281,8 +281,10 @@ public class EnglishDraughts extends Game {
 		// - one function that returns the displacement moves from a given position (without capture)
 		//
 		ArrayList<Move> moves = new ArrayList<>();
-		moves.addAll(possibleMovesWithoutCapture());
 		moves.addAll(possibleCaptureMoves());
+		if(moves.isEmpty()) {
+			moves.addAll(possibleMovesWithoutCapture());
+		}
 		return moves;
 	}
 

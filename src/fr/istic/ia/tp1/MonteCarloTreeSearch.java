@@ -33,6 +33,7 @@ public class MonteCarloTreeSearch {
 		
 		/** The children of the node: the games states accessible by playing a move from this node state */
 		ArrayList<EvalNode> children;
+
 		
 		/** 
 		 * The only constructor of EvalNode.
@@ -49,11 +50,9 @@ public class MonteCarloTreeSearch {
 		 * Compute the Upper Confidence Bound for Trees (UCT) value for the node.
 		 * @return UCT value for the node
 		 */
-		double uct() {
-			//
-			// TODO implement the UCT function (Upper Confidence Bound for Trees)
-			//
-			return 0.0;
+		double uct(int N) {
+			if (N==0) return this.n/this.w;
+			else return (w / (double) n) + 1.4142 * Math.sqrt(Math.log(nTotal) / (double) n);
 		}
 		
 		/**
@@ -61,10 +60,7 @@ public class MonteCarloTreeSearch {
 		 * @return Estimated probability of win for the node
 		 */
 		double score() {
-			//
-			// TODO implement the score function for a node
-			//
-			return 0.0;
+			return (w/n);
 		}
 		
 		/**
@@ -72,9 +68,9 @@ public class MonteCarloTreeSearch {
 		 * @param res
 		 */
 		void updateStats(RolloutResults res) {
-			//
-			// TODO implement updateStats for a node
-			//
+			this.n = res.nbSimulations();
+			//TODO A verifier
+			this.w = res.nbWins(game.player());
 		}
 	}
 	
@@ -126,9 +122,12 @@ public class MonteCarloTreeSearch {
 		 * @param winner
 		 */
 		public void update(PlayerId winner) {
-			//
-			// TODO implement the update of RolloutResults
-			//
+ 			if(winner.equals(PlayerId.ONE)) this.win1++;
+			if(winner.equals(PlayerId.TWO)) this.win2++;
+			if(winner.equals(PlayerId.NONE)) {
+				this.win1 = this.win1 + 0.5;
+				this.win2 = this.win2 + 0.5;
+			}
 		}
 		
 		/**

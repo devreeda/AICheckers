@@ -561,12 +561,49 @@ public class EnglishDraughts extends Game {
 			return;
 		// Cast and apply the move
 		DraughtsMove move = (DraughtsMove) aMove;
-		
 
-
-		
 		// Move pawn and capture opponents
-		
+		List<Move> possibleMoves = possibleMoves();
+
+		boolean captured = false;
+		byte current = board.get(move.get(0));
+		boolean isKing = board.isKing(current);
+
+		if (possibleMoves.contains(move)) {
+			board.set(move.get(0), CheckerBoard.EMPTY);
+			if (isKing && playerId == PlayerId.ONE)
+				board.set(move.get(move.size()-1), CheckerBoard.WHITE_KING);
+			else if (isKing && playerId == PlayerId.TWO)
+				board.set(move.get(move.size()-1), CheckerBoard.BLACK_KING);
+			else board.set(move.get(move.size()-1), current);
+			//capture
+			for (int i = 1; i<move.size(); ++i) {
+				if (board.neighborDownRight(board.neighborDownRight(move.get(i-1))) == move.get(i)) {
+					board.set(board.neighborDownRight(move.get(i-1)), CheckerBoard.EMPTY);
+					captured = true;
+					nbKingMovesWithoutCapture = 0;
+				}
+				if (board.neighborDownLeft(board.neighborDownLeft(move.get(i-1))) == move.get(i)) {
+					board.set(board.neighborDownLeft(move.get(i-1)), CheckerBoard.EMPTY);
+					captured = true;
+					nbKingMovesWithoutCapture = 0;
+				}
+				if (board.neighborUpRight(board.neighborUpRight(move.get(i-1))) == move.get(i)) {
+					board.set(board.neighborUpRight(move.get(i-1)), CheckerBoard.EMPTY);
+					captured = true;
+					nbKingMovesWithoutCapture = 0;
+				}
+				if (board.neighborUpLeft(board.neighborUpLeft(move.get(i-1))) == move.get(i)) {
+					board.set(board.neighborUpLeft(move.get(i-1)), CheckerBoard.EMPTY);
+					captured = true;
+					nbKingMovesWithoutCapture = 0;
+				}
+			}
+
+		}
+		if (!captured)
+			nbKingMovesWithoutCapture++;
+
 		// Promote to king if the pawn ends on the opposite of the board
 		int finMovement = move.get(move.size() - 1);
 		if (board.inTopRow(finMovement) && playerId.equals(playerId.ONE)) board.set(finMovement,CheckerBoard.WHITE_KING);
@@ -580,7 +617,6 @@ public class EnglishDraughts extends Game {
 		nbTurn++;
 		
 		// Keep track of successive moves with kings wthout capture
-
 	}
 
 	@Override
@@ -612,6 +648,7 @@ public class EnglishDraughts extends Game {
 		// return PlayerId.NONE if the game is null
 
 		// Return null is the game has not ended yet
+		System.out.println(nbKingMovesWithoutCapture);
 		return null;
 	}
 }

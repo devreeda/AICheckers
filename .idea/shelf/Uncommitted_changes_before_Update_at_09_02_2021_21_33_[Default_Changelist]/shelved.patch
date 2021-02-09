@@ -1,0 +1,217 @@
+Index: src/fr/istic/ia/tp1/MainGameLoop.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package fr.istic.ia.tp1;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Scanner;\r\nimport java.util.function.Supplier;\r\n\r\nimport fr.istic.ia.tp1.Game.Move;\r\nimport fr.istic.ia.tp1.Game.PlayerId;\r\n\r\n/**\r\n * Main class for two-player gameplay.\r\n * Can be used to play any game with the {@link Game} interface, with players classes \r\n * implementing the {@link Player} interface.\r\n * \r\n * The class provides menu building facilities to instanciate the game and players.\r\n * \r\n * @author vdrevell\r\n *\r\n */\r\n\r\npublic class MainGameLoop {\r\n\t/**\r\n\t * A named Supplier of type T\r\n\t * @author vdrevell\r\n\t *\r\n\t * @param <T>\r\n\t */\r\n\tstatic class NamedSupplier<T> implements Supplier<T> {\r\n\t\tString name;\r\n\t\tSupplier<T> supplier;\r\n\t\tpublic NamedSupplier(String name, Supplier<T> generator) {\r\n\t\t\tthis.name = name;\r\n\t\t\tthis.supplier = generator;\r\n\t\t}\r\n\t\t@Override\r\n\t\tpublic String toString() { return name; };\r\n\t\t@Override\r\n\t\tpublic T get() { return supplier.get(); }\r\n\t}\r\n\t\r\n\t/**\r\n\t * Display a menu and let the user chose an item from a list.\r\n\t * @param list\r\n\t * @return The list element chosen by the user\r\n\t */\r\n\tstatic <T> T chooseInList(ArrayList<T> list) {\r\n\t\tif (list.isEmpty()) {\r\n\t\t\tSystem.out.println(\"No choice.\");\r\n\t\t\treturn null;\r\n\t\t}\r\n\t\t\r\n\t\tif (list.size() == 1) {\r\n\t\t\tSystem.out.println(\"> \" + list.get(0));\r\n\t\t\treturn list.get(0);\r\n\t\t}\r\n\t\t\r\n\t\tfor (int i=0; i<list.size(); ++i) {\r\n\t\t\tSystem.out.println(\" \" + i + \". \" + list.get(i));\r\n\t\t}\r\n\t\t\r\n\t\t@SuppressWarnings(\"resource\")\r\n\t\tScanner sc = new Scanner(System.in);\r\n\t\tint chosenNum = -1;\r\n\t\t\r\n\t\twhile (chosenNum < 0 || chosenNum >= list.size()) {\r\n\t\t\tSystem.out.print(\"Please enter your choice: \");\r\n\t\t\tif (sc.hasNextInt()) {\r\n\t\t\t\tchosenNum = sc.nextInt();\r\n\t\t\t}\r\n\t\t\telse {\r\n\t\t\t\tif (sc.hasNext()) sc.next();\r\n\t\t\t}\r\n\t\t}\r\n\t\treturn list.get(chosenNum);\r\n\t}\r\n\t\r\n\t/**\r\n\t * A {@link Player} factory, asking the user to chose the object to create from a list\r\n\t * @param name Name of the player to create\r\n\t * @return A new {@link Player} instance\r\n\t */\r\n\tstatic Player chooseAndCreatePlayer(String name) {\r\n\t\tArrayList<NamedSupplier<Player>> list = new ArrayList<NamedSupplier<Player>>();\r\n\t\tlist.add( new NamedSupplier<Player>(\"Human\",     () -> new PlayerHuman(false)) );\r\n\t\tlist.add( new NamedSupplier<Player>(\"Human (with list)\", () -> new PlayerHuman(true)) );\r\n\t\tlist.add( new NamedSupplier<Player>(\"Random\",    () -> new PlayerRandom())     );\r\n\t\tlist.add( new NamedSupplier<Player>(\"MCTS 1 s\",  () -> new PlayerMCTS(1000))   );\r\n\t\tlist.add( new NamedSupplier<Player>(\"MCTS 2 s\",  () -> new PlayerMCTS(2000))   );\r\n\t\tlist.add( new NamedSupplier<Player>(\"MCTS 5 s\",  () -> new PlayerMCTS(5000))   );\r\n\t\tlist.add( new NamedSupplier<Player>(\"MCTS 10 s\", () -> new PlayerMCTS(10000))  );\r\n\t\t\r\n\t\tSystem.out.println(\"Select player type for \" + name + \":\");\r\n\t\treturn chooseInList(list).get();\r\n\t}\r\n\t\r\n\t/**\r\n\t * A {@link Game} factory, asking the user to chose the object to create from a list\r\n\t * @return A new {@link Game} instance\r\n\t */\r\n\tstatic Game chooseAndCreateGame() {\r\n\t\tArrayList<NamedSupplier<Game>> list = new ArrayList<NamedSupplier<Game>>();\r\n\t\tlist.add( new NamedSupplier<Game>(\"English Draughts (8x8)\",    () -> new EnglishDraughts())   );\r\n\t\tlist.add( new NamedSupplier<Game>(\"English Draughts on 10x10\", () -> new EnglishDraughts(10)) );\r\n\t\tlist.add( new NamedSupplier<Game>(\"English Draughts on 6x6\",   () -> new EnglishDraughts(6))  );\r\n\t\t\r\n\t\tSystem.out.println(\"Select the game to play:\");\r\n\t\treturn chooseInList(list).get();\r\n\t}\r\n\r\n\t/**\r\n\t * Two-player gameplay program entry point (main)\r\n\t *\r\n\t * - The program first instanciates a Game from user input, and then two Players based on user choice.\r\n\t * - Then the game loop starts, letting both players play until the end of the game\r\n\t * - The winner (or equality) is finally displayed before the program quits.\r\n\t * @param args\r\n\t */\r\n\tpublic static void main(String[] args) {\r\n\t\tSystem.out.println(\"English Draughts - M1 IL ISTIC - TP IA\");\r\n\t\t\r\n\t\t// Create a new game\r\n\t\tGame game = chooseAndCreateGame();\r\n\t\t\r\n\t\t// Create the two players\r\n\t\tPlayer player1 = chooseAndCreatePlayer(game.playerName(PlayerId.ONE));\r\n\t\tPlayer player2 = chooseAndCreatePlayer(game.playerName(PlayerId.TWO));\r\n\t\t\r\n\t\t// Game loop until the end of the game\r\n\t\twhile (game.winner() == null) {\t\t\r\n\t\t\tSystem.out.print(game.view());\r\n\r\n\t\t\t// Get the move from the Player object\r\n\t\t\tMove move = null;\r\n\t\t\tswitch (game.player()) {\r\n\t\t\tcase ONE:\r\n\t\t\t\tmove = player1.play(game);\r\n\t\t\t\tbreak;\r\n\t\t\tcase TWO:\r\n\t\t\t\tmove = player2.play(game);\r\n\t\t\t\tbreak;\r\n\t\t\tdefault:\r\n\t\t\t\tmove = null;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t// Exit if something went wrong\r\n\t\t\tif (move == null) {\r\n\t\t\t\tSystem.out.println(\"Error, \" + game.playerName(game.player())+  \" cannot play. Abort.\");\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\r\n\t\t\t// Display the chosen move\r\n\t\t\tSystem.out.println(\"> \" + game.playerName(game.player()) + \" played \" + move);\r\n\t\t\tSystem.out.println();\r\n\t\t\t\r\n\t\t\t// Update the game state with the chosen move\r\n\t\t\tgame.play(move);\r\n\t\t}\r\n\t\t\r\n\t\t// Display the winner\r\n\t\tSystem.out.println(game.view());\r\n\t\tSystem.out.println(game.playerName(game.winner()) + \" wins!\");\r\n\t}\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/fr/istic/ia/tp1/MainGameLoop.java	(revision 60312ab0b0a1d22ba1fc02ecef7d8ef800682426)
++++ src/fr/istic/ia/tp1/MainGameLoop.java	(date 1612894474164)
+@@ -102,6 +102,7 @@
+ 		list.add( new NamedSupplier<Game>("English Draughts (8x8)",    () -> new EnglishDraughts())   );
+ 		list.add( new NamedSupplier<Game>("English Draughts on 10x10", () -> new EnglishDraughts(10)) );
+ 		list.add( new NamedSupplier<Game>("English Draughts on 6x6",   () -> new EnglishDraughts(6))  );
++		list.add( new NamedSupplier<Game>( "Tic Tac Toe", () -> new TicTacToe()));
+ 		
+ 		System.out.println("Select the game to play:");
+ 		return chooseInList(list).get();
+Index: src/fr/istic/ia/tp1/PlayerHuman.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package fr.istic.ia.tp1;\r\n\r\nimport java.io.IOException;\r\nimport java.util.Iterator;\r\nimport java.util.List;\r\nimport java.util.Scanner;\r\nimport fr.istic.ia.tp1.Game.Move;\r\n\r\n/**\r\n * An implementation of {@link Player} that asks the user to enter a move.\r\n * Entry is either from a list, or by typing the move (see constructor).\r\n * @author vdrevell\r\n *\r\n */\r\npublic class PlayerHuman implements Player {\r\n\tboolean displayChoices;\r\n\t\r\n\t/**\r\n\t * Default constructor\r\n\t * Human player with display of feasible moves\r\n\t */\r\n\tpublic PlayerHuman() {\r\n\t\tthis(true);\r\n\t}\r\n\t\r\n\t/**\r\n\t * Constructor\r\n\t * @param displayChoices : if true, displays the list of choices, otherwise, the user has to type the move.\r\n\t */\r\n\tpublic PlayerHuman(boolean displayChoices) {\r\n\t\tthis.displayChoices = displayChoices;\r\n\t}\r\n\r\n\t@Override\r\n\tpublic Move play(Game game) {\r\n\t\tList<Move> moves = game.possibleMoves();\r\n\t\t\r\n\t\tif (moves.isEmpty()) {\r\n\t\t\tSystem.out.println(\"No possible move! Press enter to continue...\");\r\n\t\t\ttry {\r\n\t\t\t\tSystem.in.read();\r\n\t\t\t} catch (IOException e) {\r\n\t\t\t}\r\n\t\t\treturn null;\r\n\t\t}\r\n\t\t\r\n\t\t@SuppressWarnings(\"resource\")\r\n\t\tScanner sc = new Scanner(System.in);\r\n\t\t\r\n\t\tif (displayChoices) {\r\n\t\t\tIterator<Move> it = moves.iterator();\r\n\t\t\tfor (int i=0; it.hasNext(); ++i) {\r\n\t\t\t\tSystem.out.println(String.format(\"%2d. \",i) + it.next());\r\n\t\t\t}\r\n\t\t\tint chosenNum = -1;\r\n\t\t\twhile (chosenNum < 0 || chosenNum >= moves.size()) {\r\n\t\t\t\tSystem.out.print(\"Please enter your choice: \");\r\n\t\t\t\tif (sc.hasNextInt()) {\r\n\t\t\t\t\tchosenNum = sc.nextInt();\r\n\t\t\t\t}\r\n\t\t\t\telse {\r\n\t\t\t\t\tif (sc.hasNext()) sc.next();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\tit = moves.iterator();\r\n\t\t\tfor (int i=0; i<chosenNum; ++i) {\r\n\t\t\t\tit.next();\r\n\t\t\t}\r\n\t\t\treturn it.next();\r\n\t\t}\r\n\t\telse {\r\n\t\t\tfor (int i=0; i<25; ++i) {\r\n\t\t\t\tSystem.out.print(\"Please enter your move: \");\r\n\t\t\t\tif (sc.hasNextLine()) {\r\n\t\t\t\t\tString moveString = sc.nextLine().trim(); // better use .strip() if java 11\r\n\t\t\t\t\t\r\n\t\t\t\t\tIterator<Move> it = moves.iterator();\r\n\t\t\t\t\twhile (it.hasNext()) {\r\n\t\t\t\t\t\tMove move = it.next();\r\n\t\t\t\t\t\tif (moveString.equals(move.toString().trim())) { // use .strip() if java 11\r\n\t\t\t\t\t\t\treturn move;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\telse {\r\n\t\t\t\t\tif (sc.hasNext()) sc.next();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tSystem.out.println(\"Exceeded 25 input tries, abort...\");\r\n\t\t\treturn null;\r\n\t\t}\r\n\t}\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/fr/istic/ia/tp1/PlayerHuman.java	(revision 60312ab0b0a1d22ba1fc02ecef7d8ef800682426)
++++ src/fr/istic/ia/tp1/PlayerHuman.java	(date 1611732160799)
+@@ -1,6 +1,7 @@
+ package fr.istic.ia.tp1;
+ 
+ import java.io.IOException;
++import java.util.ArrayList;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Scanner;
+@@ -43,6 +44,13 @@
+ 			}
+ 			return null;
+ 		}
++		// Test affichage des coups possibles
++		else {
++			System.out.println("Moves possible : \n");
++			for(Move move : moves){
++				System.out.println(move.toString());
++			};
++		}
+ 		
+ 		@SuppressWarnings("resource")
+ 		Scanner sc = new Scanner(System.in);
+Index: AICheckers.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module type=\"JAVA_MODULE\" version=\"4\">\r\n  <component name=\"NewModuleRootManager\" inherit-compiler-output=\"true\">\r\n    <exclude-output />\r\n    <content url=\"file://$MODULE_DIR$\">\r\n      <sourceFolder url=\"file://$MODULE_DIR$/src\" isTestSource=\"false\" />\r\n    </content>\r\n    <orderEntry type=\"inheritedJdk\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n  </component>\r\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- AICheckers.iml	(revision 60312ab0b0a1d22ba1fc02ecef7d8ef800682426)
++++ AICheckers.iml	(date 1611734666906)
+@@ -7,5 +7,15 @@
+     </content>
+     <orderEntry type="inheritedJdk" />
+     <orderEntry type="sourceFolder" forTests="false" />
++    <orderEntry type="module-library">
++      <library name="JUnit4">
++        <CLASSES>
++          <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/" />
++          <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar!/" />
++        </CLASSES>
++        <JAVADOC />
++        <SOURCES />
++      </library>
++    </orderEntry>
+   </component>
+ </module>
+\ No newline at end of file
+Index: src/fr/istic/ia/tp1/MonteCarloTreeSearch.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package fr.istic.ia.tp1;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Iterator;\r\nimport java.util.List;\r\nimport java.util.concurrent.TimeUnit;\r\n\r\nimport fr.istic.ia.tp1.Game.Move;\r\nimport fr.istic.ia.tp1.Game.PlayerId;\r\n\r\n/**\r\n * A class implementing a Monte-Carlo Tree Search method (MCTS) for playing two-player games ({@link Game}).\r\n * @author vdrevell\r\n *\r\n */\r\npublic class MonteCarloTreeSearch {\r\n\r\n\t/**\r\n\t * A class to represent an evaluation node in the MCTS tree.\r\n\t * This is a member class so that each node can access the global statistics of the owning MCTS.\r\n\t * @author vdrevell\r\n\t *\r\n\t */\r\n\tclass EvalNode {\r\n\t\t/** The number of simulations run through this node */\r\n\t\tint n;\r\n\t\t\r\n\t\t/** The number of winning runs */\r\n\t\tdouble w;\r\n\t\t\r\n\t\t/** The game state corresponding to this node */\r\n\t\tGame game;\r\n\t\t\r\n\t\t/** The children of the node: the games states accessible by playing a move from this node state */\r\n\t\tArrayList<EvalNode> children;\r\n\r\n\t\t\r\n\t\t/** \r\n\t\t * The only constructor of EvalNode.\r\n\t\t * @param game The game state corresponding to this node.\r\n\t\t */\r\n\t\tEvalNode(Game game) {\r\n\t\t\tthis.game = game;\r\n\t\t\tchildren = new ArrayList<EvalNode>();\r\n\t\t\tw = 0.0;\r\n\t\t\tn = 0;\r\n\t\t}\r\n\t\t\r\n\t\t/**\r\n\t\t * Compute the Upper Confidence Bound for Trees (UCT) value for the node.\r\n\t\t * @return UCT value for the node\r\n\t\t */\r\n\t\tdouble uct() {\r\n\t\t\tif (n==0) return Integer.MAX_VALUE;\r\n\t\t\telse return (w / (double) n) + 1.4142 * Math.sqrt(Math.log(nTotal) / (double) n);\r\n\t\t}\r\n\t\t\r\n\t\t/**\r\n\t\t * \"Score\" of the node, i.e estimated probability of winning when moving to this node\r\n\t\t * @return Estimated probability of win for the node\r\n\t\t */\r\n\t\tdouble score() {\r\n\t\t\treturn (w/n);\r\n\t\t}\r\n\t\t\r\n\t\t/**\r\n\t\t * Update the stats (n and w) of the node with the provided rollout results\r\n\t\t * @param res\r\n\t\t */\r\n\t\tvoid updateStats(RolloutResults res) {\r\n\t\t\tthis.n = res.nbSimulations();\r\n\t\t\t//TODO A verifier\r\n\t\t\tthis.w = res.nbWins(game.player());\r\n\t\t}\r\n\t}\r\n\t\r\n\t/**\r\n\t * A class to hold the results of the rollout phase\r\n\t * Keeps the number of wins for each player and the number of simulations.\r\n\t * @author vdrevell\r\n\t *\r\n\t */\r\n\tstatic class RolloutResults {\r\n\t\t/** The number of wins for player 1 {@link PlayerId#ONE}*/\r\n\t\tdouble win1;\r\n\t\t\r\n\t\t/** The number of wins for player 2 {@link PlayerId#TWO}*/\r\n\t\tdouble win2;\r\n\t\t\r\n\t\t/** The number of playouts */\r\n\t\tint n;\r\n\t\t\r\n\t\t/**\r\n\t\t * The constructor\r\n\t\t */\r\n\t\tpublic RolloutResults() {\r\n\t\t\treset();\r\n\t\t}\r\n\t\t\r\n\t\t/**\r\n\t\t * Reset results\r\n\t\t */\r\n\t\tpublic void reset() {\r\n\t\t\tn = 0;\r\n\t\t\twin1 = 0.0;\r\n\t\t\twin2 = 0.0;\r\n\t\t}\r\n\t\t\r\n\t\t/**\r\n\t\t * Add other results to this\r\n\t\t * @param res The results to add\r\n\t\t */\r\n\t\tpublic void add(RolloutResults res) {\r\n\t\t\twin1 += res.win1;\r\n\t\t\twin2 += res.win2;\r\n\t\t\tn += res.n;\r\n\t\t}\r\n\t\t\r\n\t\t/**\r\n\t\t * Update playout statistics with a win of the player <code>winner</code>\r\n\t\t * Also handles equality if <code>winner</code>={@link PlayerId#NONE}, adding 0.5 wins to each player\r\n\t\t * @param winner\r\n\t\t */\r\n\t\tpublic void update(PlayerId winner) {\r\n \t\t\tif(winner.equals(PlayerId.ONE)) this.win1++;\r\n\t\t\tif(winner.equals(PlayerId.TWO)) this.win2++;\r\n\t\t\tif(winner.equals(PlayerId.NONE)) {\r\n\t\t\t\tthis.win1 = this.win1 + 0.5;\r\n\t\t\t\tthis.win2 = this.win2 + 0.5;\r\n\t\t\t}\r\n\t\t}\r\n\t\t\r\n\t\t/**\r\n\t\t * Getter for the number of wins of a player\r\n\t\t * @param playerId\r\n\t\t * @return The number of wins of player <code>playerId</code>\r\n\t\t */\r\n\t\tpublic double nbWins(PlayerId playerId) {\r\n\t\t\tswitch (playerId) {\r\n\t\t\tcase ONE: return win1;\r\n\t\t\tcase TWO: return win2;\r\n\t\t\tdefault: return 0.0;\r\n\t\t\t}\r\n\t\t}\r\n\t\t\r\n\t\t/**\r\n\t\t * Getter for the number of simulations\r\n\t\t * @return The number of playouts\r\n\t\t */\r\n\t\tpublic int nbSimulations() {\r\n\t\t\treturn n;\r\n\t\t}\r\n\t}\r\n\t\r\n\t/**\r\n\t * The root of the MCTS tree\r\n\t */\r\n\tEvalNode root;\r\n\t\r\n\t/**\r\n\t * The total number of performed simulations (rollouts)\r\n\t */\r\n\tint nTotal;\r\n\r\n\t\r\n\t/**\r\n\t * The constructor\r\n\t * @param game\r\n\t */\r\n\tpublic MonteCarloTreeSearch(Game game) {\r\n\t\troot = new EvalNode(game.clone());\r\n\t\tnTotal = 0;\r\n\t}\r\n\t\r\n\t/**\r\n\t * Perform a single random playing rollout from the given game state\r\n\t * @param game Initial game state. {@code game} will contain an ended game state when the function returns.\r\n\t * @return The PlayerId of the winner (or NONE if equality or timeout).\r\n\t */\r\n\tstatic PlayerId playRandomlyToEnd(Game game) {\r\n\t\twhile(game.winner().equals(null)){\r\n\t\t\tPlayer bot = new PlayerRandom();\r\n\t\t\tbot.play(game);\r\n\t\t}\r\n\t\treturn game.winner();\r\n\t}\r\n\t\r\n\t/**\r\n\t * Perform nbRuns rollouts from a game state, and returns the winning statistics for both players.\r\n\t * @param game The initial game state to start with (not modified by the function)\r\n\t * @param nbRuns The number of playouts to perform\r\n\t * @return A RolloutResults object containing the number of wins for each player and the number of simulations\r\n\t */\r\n\tstatic RolloutResults rollOut(final Game game, int nbRuns) {\r\n\t\tRolloutResults roll = new RolloutResults();\r\n\t\tfor(int i = 0; i < nbRuns; i++){\r\n\t\t\troll.update(playRandomlyToEnd(game));\r\n\t\t}\r\n\t\treturn roll;\r\n\t}\r\n\t\r\n\t/**\r\n\t * Apply the MCTS algorithm during at most <code>timeLimitMillis</code> milliseconds to compute\r\n\t * the MCTS tree statistics.\r\n\t * @param timeLimitMillis Computation time limit in milliseconds\r\n\t */\r\n\tpublic void evaluateTreeWithTimeLimit(int timeLimitMillis) {\r\n\t\t// Record function entry time\r\n\t\tlong startTime = System.nanoTime();\r\n\r\n\t\t// Evaluate the tree until timeout\r\n\t\twhile (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) < timeLimitMillis) {\r\n\t\t\t// Perform one MCTS step\r\n\t\t\tboolean canStop = evaluateTreeOnce();\r\n\t\t\t// Stop evaluating the tree if there is nothing more to explore\r\n\t\t\tif (canStop) {\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t}\r\n\t\t\r\n\t\t// Print some statistics\r\n\t\tSystem.out.println(\"Stopped search after \" \r\n\t\t       + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) + \" ms. \"\r\n\t\t       + \"Root stats is \" + root.w + \"/\" + root.n + String.format(\" (%.2f%% loss)\", 100.0*root.w/root.n));\r\n\t}\r\n\t\r\n\t/**\r\n\t * Perform one MCTS step (selection, expansion(s), simulation(s), backpropagation\r\n\t * @return <code>true</code> if there is no need for further exploration (to speed up end of games).\r\n\t */\r\n\tpublic boolean evaluateTreeOnce() {\r\n\t\t// List of visited nodes\r\n\t\tList<EvalNode> visited = new ArrayList<EvalNode>();\r\n\t\tif(nTotal == 0) visited.add(root);\r\n\t\t\r\n\t\t// Start from the root\r\n\t\tList<Move> possiblesMoves =  root.game.possibleMoves();\r\n\t\tfor(int i = 0; i < possiblesMoves.size(); i++){\r\n\t\t\tGame possibleGame = root.game.clone();\r\n\t\t\tpossibleGame.play(possiblesMoves.get(i));\r\n\t\t\troot.children.add(new EvalNode(possibleGame));\r\n\t\t}\r\n\r\n\t\t\r\n\t\t// Selection (with UCT tree policy)\r\n\t\tint indexNextNode = -1;\r\n\t\tint biggestUCT = 0;\r\n\t\tfor(int i = 0; i < root.children.size(); i++){\r\n\t\t\tif(biggestUCT < root.children.get(i).uct()){\r\n\t\t\t\tindexNextNode = i;\r\n\t\t\t}\r\n\t\t}\r\n\t\tif(indexNextNode < 0) System.out.println(\"Index of next node to explore < 0 : Impossible !\");\r\n\r\n\t\t// Expand node\r\n\t\tvisited.add(root.children.get(indexNextNode));\r\n\t\t\r\n\t\t// Simulate from new node(s)\r\n\t\t//TODO Remplacer en utilisant RollOut et modifier le backpropagate en consequence\r\n\t\tPlayerId winner = playRandomlyToEnd(root.children.get(indexNextNode).game);\r\n\t\t\r\n\t\t// Backpropagate results\r\n\t\tfor(int i = 0; i < visited.size(); i++){\r\n\t\t\tif(i%2 == 0) {\r\n\t\t\t\tvisited.get(i).n++;\r\n\t\t\t\tvisited.get(i).w++;\r\n\t\t\t}\r\n\t\t\telse{\r\n\t\t\t\tvisited.get(i).n++;\r\n\t\t\t}\r\n\t\t}\r\n\t\t\r\n\t\t// Return false if tree evaluation should continue\r\n\t\t//TODO Changer la condition si necessaire\r\n\t\tif(visited.size() > 100) return true;\r\n\t\telse return false;\r\n\t}\r\n\t\r\n\t/**\r\n\t * Select the best move to play, given the current MCTS tree playout statistics\r\n\t * @return The best move to play from the current MCTS tree state.\r\n\t */\r\n\tpublic Move getBestMove() {\r\n\t\tList<EvalNode> children = root.children;\r\n\t\tList<Move> possibleMoves = root.game.possibleMoves();\r\n\t\tint indexOfBestChildren = -1;\r\n\t\tdouble bestScore = 0;\r\n\t\tfor(int i = 0; i < children.size(); i++){\r\n\t\t\tif(children.get(i).score() > bestScore) indexOfBestChildren = i;\r\n\t\t}\r\n\t\tif (indexOfBestChildren < 0) System.out.println(\"Erreur getBestMove\");\r\n\t\treturn possibleMoves.get(indexOfBestChildren);\r\n\t}\r\n\t\r\n\t\r\n\t/**\r\n\t * Get a few stats about the MTS tree and the possible moves scores\r\n\t * @return A string containing MCTS stats\r\n\t */\r\n\tpublic String stats() {\r\n\t\tString str = \"MCTS with \" + nTotal + \" evals\\n\";\r\n\t\tIterator<Move> itMove = root.game.possibleMoves().iterator();\r\n\t\tfor (EvalNode node : root.children) {\r\n\t\t\tMove move = itMove.next();\r\n\t\t\tdouble score = node.score();\r\n\t\t\tstr += move + \" : \" + score + \" (\" + node.w + \"/\" + node.n + \")\\n\";\r\n\t\t}\r\n\t\treturn str;\r\n\t}\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/fr/istic/ia/tp1/MonteCarloTreeSearch.java	(revision 60312ab0b0a1d22ba1fc02ecef7d8ef800682426)
++++ src/fr/istic/ia/tp1/MonteCarloTreeSearch.java	(date 1612902706308)
+@@ -178,9 +178,11 @@
+ 	 * @return The PlayerId of the winner (or NONE if equality or timeout).
+ 	 */
+ 	static PlayerId playRandomlyToEnd(Game game) {
+-		while(game.winner().equals(null)){
++		System.out.println(game.toString());
++		while(game.winner() == null){
++			System.out.println("BouclePlayRandom " + game.view());
+ 			Player bot = new PlayerRandom();
+-			bot.play(game);
++			game.play(bot.play(game));
+ 		}
+ 		return game.winner();
+ 	}
+@@ -230,17 +232,19 @@
+ 	 */
+ 	public boolean evaluateTreeOnce() {
+ 		// List of visited nodes
+-		List<EvalNode> visited = new ArrayList<EvalNode>();
+-		if(nTotal == 0) visited.add(root);
++		List<EvalNode> visited = new ArrayList<>();
++		visited.add(root);
++
+ 		
+ 		// Start from the root
+-		List<Move> possiblesMoves =  root.game.possibleMoves();
+-		for(int i = 0; i < possiblesMoves.size(); i++){
+-			Game possibleGame = root.game.clone();
+-			possibleGame.play(possiblesMoves.get(i));
+-			root.children.add(new EvalNode(possibleGame));
+-		}
++			List<Move> possiblesMoves = root.game.possibleMoves();
++			for (int i = 0; i < possiblesMoves.size(); i++) {
++				Game possibleGame = root.game.clone();
++				possibleGame.play(possiblesMoves.get(i));
++				root.children.add(new EvalNode(possibleGame));
++			}
+ 
++
+ 		
+ 		// Selection (with UCT tree policy)
+ 		int indexNextNode = -1;
+@@ -254,26 +258,45 @@
+ 
+ 		// Expand node
+ 		visited.add(root.children.get(indexNextNode));
++		System.out.println("Nombre de noeud dans visited : " + visited.size());
+ 		
+ 		// Simulate from new node(s)
+-		//TODO Remplacer en utilisant RollOut et modifier le backpropagate en consequence
+-		PlayerId winner = playRandomlyToEnd(root.children.get(indexNextNode).game);
+-		
++		System.out.println("Let's simulate ! ");
++		//PlayerId winner = playRandomlyToEnd(root.children.get(indexNextNode).game);
++		RolloutResults rollout = rollOut(root.children.get(indexNextNode).game,10);
++		System.out.println("Résultat rollOut : win1:" + rollout.win1 + " win2:" +rollout.win2);
++
++		System.out.println("Let's backpropagate ! ");
+ 		// Backpropagate results
+ 		for(int i = 0; i < visited.size(); i++){
+-			if(i%2 == 0) {
+-				visited.get(i).n++;
+-				visited.get(i).w++;
+-			}
+-			else{
+-				visited.get(i).n++;
+-			}
+-		}
+-		
++			if(i == 0%2 ) {
++				visited.get(i).w = visited.get(i).w + rollout.win1;
++			}
++			else {
++				visited.get(i).w = visited.get(i).w + rollout.win2;
++			}
++			visited.get(i).n = visited.get(i).n + rollout.n;
++		}
++		System.out.println("Stats root :" + root.w + "/" + root.n);
++		/*
++		if(winner.equals(PlayerId.ONE)){
++			for(int i = 0; i < visited.size(); i++){
++				visited.get(i)
++				if(i%2 == 0) {
++					visited.get(i).n++;
++					visited.get(i).w++;
++				}
++				else{
++					visited.get(i).n++;
++				}
++			}
++		}*/
++
++		System.out.println("Let's explore ! ");
+ 		// Return false if tree evaluation should continue
+ 		//TODO Changer la condition si necessaire
+-		if(visited.size() > 100) return true;
+-		else return false;
++		nTotal+= 10;
++		return root.children.isEmpty();
+ 	}
+ 	
+ 	/**
+@@ -281,6 +304,7 @@
+ 	 * @return The best move to play from the current MCTS tree state.
+ 	 */
+ 	public Move getBestMove() {
++		System.out.println("Recherche du meilleur coups possible ..");
+ 		List<EvalNode> children = root.children;
+ 		List<Move> possibleMoves = root.game.possibleMoves();
+ 		int indexOfBestChildren = -1;
+@@ -288,6 +312,7 @@
+ 		for(int i = 0; i < children.size(); i++){
+ 			if(children.get(i).score() > bestScore) indexOfBestChildren = i;
+ 		}
++		System.out.println("Le meilleur move est :" + bestScore + " fois gagné" );
+ 		if (indexOfBestChildren < 0) System.out.println("Erreur getBestMove");
+ 		return possibleMoves.get(indexOfBestChildren);
+ 	}
+Index: .idea/codeStyles/Project.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/codeStyles/Project.xml	(date 1611732160840)
++++ .idea/codeStyles/Project.xml	(date 1611732160840)
+@@ -0,0 +1,7 @@
++<component name="ProjectCodeStyleConfiguration">
++  <code_scheme name="Project" version="173">
++    <ScalaCodeStyleSettings>
++      <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
++    </ScalaCodeStyleSettings>
++  </code_scheme>
++</component>
+\ No newline at end of file

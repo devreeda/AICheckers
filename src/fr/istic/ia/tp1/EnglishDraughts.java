@@ -177,6 +177,8 @@ public class EnglishDraughts extends Game {
 		}
 	}
 
+	/*
+	//FIXME : MA MÉTHODE
 	public List<Move> possibleCaptureMoves() {
 		List<Integer> myPawns = this.myPawns();
 		List<Move> possibleMoves = new ArrayList<Move>();
@@ -193,14 +195,14 @@ public class EnglishDraughts extends Game {
 				int upLeft = board.neighborUpLeft(pawn);
 				int upRight = board.neighborUpRight(pawn);
 				//check if the upleft neighbour is black and that the pawn can take it
-				if (board.isBlack(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
+				if (upLeft != 0 && board.isBlack(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
 					DraughtsMove move = new DraughtsMove();
 					move.add(pawn);
 					move.add(board.neighborUpLeft(upLeft));
 					possibleMoves.add(move);
 				}
 				//check if the upright neighbour is black and that the pawn can take it
-				if (board.isBlack(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
+				if (upRight != 0 && board.isBlack(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
 					DraughtsMove move = new DraughtsMove();
 					move.add(pawn);
 					move.add(board.neighborUpLeft(upRight));
@@ -211,13 +213,13 @@ public class EnglishDraughts extends Game {
 					int downLeft = board.neighborDownLeft(pawn);
 					int downRight = board.neighborDownRight(pawn);
 
-					if (board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+					if (downLeft != 0 && board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
 						DraughtsMove move = new DraughtsMove();
 						move.add(pawn);
 						move.add(board.neighborUpLeft(downLeft));
 						possibleMoves.add(move);
 					}
-					if (board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+					if (downRight != 0 && board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
 						DraughtsMove move = new DraughtsMove();
 						move.add(pawn);
 						move.add(board.neighborUpLeft(downRight));
@@ -230,13 +232,13 @@ public class EnglishDraughts extends Game {
 				int downLeft = board.neighborDownLeft(pawn);
 				int downRight = board.neighborDownRight(pawn);
 
-				if (board.isWhite(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+				if (downLeft != 0 && board.isWhite(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
 					DraughtsMove move = new DraughtsMove();
 					move.add(pawn);
 					move.add(board.neighborUpLeft(downLeft));
 					possibleMoves.add(move);
 				}
-				if (board.isWhite(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+				if (downRight != 0 && board.isWhite(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
 					DraughtsMove move = new DraughtsMove();
 					move.add(pawn);
 					move.add(board.neighborUpLeft(downRight));
@@ -246,13 +248,13 @@ public class EnglishDraughts extends Game {
 				if (board.isKing(pawn)) {
 					int upLeft = board.neighborUpLeft(pawn);
 					int upRight = board.neighborUpRight(pawn);
-					if (board.isWhite(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
+					if (upLeft != 0 && board.isWhite(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
 						DraughtsMove move = new DraughtsMove();
 						move.add(pawn);
 						move.add(board.neighborUpLeft(upLeft));
 						possibleMoves.add(move);
 					}
-					if (board.isWhite(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
+					if (upRight != 0 && board.isWhite(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
 						DraughtsMove move = new DraughtsMove();
 						move.add(pawn);
 						move.add(board.neighborUpLeft(upRight));
@@ -337,7 +339,101 @@ public class EnglishDraughts extends Game {
 		}
 		return moves;
 	}
+*/
+	List<Integer> listeDestinationsSautsPossiblesDepuisCase(int pawn, boolean isKing, int lastDestination) {
+		ArrayList<Integer> dest = new ArrayList<>();
+		// check if the player is white so that it goes to the right direction
+		if (playerId.equals(PlayerId.ONE)) { //White
+			int upLeft = board.neighborUpLeft(pawn);
+			int upRight = board.neighborUpRight(pawn);
+			//check if the upleft neighbour is black and that the pawn can take it
+			//System.out.println(upLeft);
+			//System.out.println(upRight);
+			if (upLeft > 0 && board.neighborUpLeft(upLeft) > 0 && board.isBlack(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
+				if (board.neighborUpLeft(upLeft) != lastDestination)
+					dest.add(board.neighborUpLeft(upLeft));
+			}
+			//check if the upright neighbour is black and that the pawn can take it
+			if (upRight > 0 && board.neighborUpRight(upRight) > 0 && board.isBlack(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
+				if (board.neighborUpRight(upRight) != lastDestination)
+					dest.add(board.neighborUpRight(upRight));
+			}
+			// if the pawn is a king, it can also take from the other direction
+			if (pawn > 0 && isKing) {
+				int downLeft = board.neighborDownLeft(pawn);
+				int downRight = board.neighborDownRight(pawn);
 
+				//System.out.println(downRight);
+				//System.out.println(downLeft);
+
+				if (downLeft > 0 && board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+					if (board.neighborDownLeft(downLeft) != lastDestination)
+						dest.add(board.neighborDownLeft(downLeft));
+				}
+				if (downRight > 0 && board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+					if (board.neighborDownRight(downRight) != lastDestination)
+						dest.add(board.neighborDownRight(downRight));
+				}
+			}
+		}
+		// check if the player is black so that it goes to the right direction
+		if (playerId.equals(PlayerId.TWO)) {
+			int downLeft = board.neighborDownLeft(pawn);
+			int downRight = board.neighborDownRight(pawn);
+
+			//System.out.println(downRight);
+			//System.out.println(downLeft);
+
+			if (downLeft > 0 && board.neighborDownLeft(downLeft) > 0 && board.isWhite(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+				if (board.neighborDownLeft(downLeft) != lastDestination)
+					dest.add(board.neighborDownLeft(downLeft));
+			}
+			if (downRight > 0 && board.neighborDownRight(downRight) > 0 &&  board.isWhite(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+				if (board.neighborDownRight(downRight) != lastDestination)
+					dest.add(board.neighborDownRight(downRight));
+			}
+
+			if (pawn > 0 && isKing) {
+				int upLeft = board.neighborUpLeft(pawn);
+				int upRight = board.neighborUpRight(pawn);
+				if (upLeft > 0 && board.neighborUpLeft(upLeft) > 0 && board.isWhite(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
+					if (board.neighborUpLeft(upLeft) != lastDestination)
+						dest.add(board.neighborUpLeft(upLeft));
+				}
+				if (upRight > 0 && board.neighborUpRight(upRight) > 0 && board.isWhite(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
+					if (board.neighborUpRight(upRight) != lastDestination)
+						dest.add(board.neighborUpRight(upRight));
+				}
+			}
+		}
+		return dest;
+	}
+
+	List<DraughtsMove> prisesPossiblesDepuisCase(int square, boolean isKing, int lastDestination) {
+		List<DraughtsMove> moves = new ArrayList<>();
+		List<Integer> destSauts = listeDestinationsSautsPossiblesDepuisCase(square, isKing, lastDestination);
+		//System.out.println(destSauts.size());
+		for (int dest : destSauts) {
+			List<DraughtsMove> movesPrisesDest = prisesPossiblesDepuisCase(dest, isKing, square);
+			//System.out.println(square + " " +movesPrisesDest);
+			if (movesPrisesDest.isEmpty()) {
+				DraughtsMove move = new DraughtsMove();
+				move.add(square);
+				move.add(dest);
+				moves.add(move);
+			} else {
+				for (DraughtsMove moveDest : movesPrisesDest) {
+					DraughtsMove move = new DraughtsMove();
+					move.add(square);
+					move.add(dest);
+					for (int i = 1; i<moveDest.size(); ++i)
+						move.add(moveDest.get(i));
+					moves.add(move);
+				}
+			}
+		}
+		return moves;
+	}
 
 	/**
 	 * Generate the list of possible moves
@@ -356,7 +452,18 @@ public class EnglishDraughts extends Game {
 		// - one function that returns the displacement moves from a given position (without capture)
 		//
 		ArrayList<Move> moves = new ArrayList<>();
-		moves.addAll(possibleCaptureMoves());
+
+		ArrayList<Move> possibleCaptureMoves = new ArrayList<>();
+		for(int i = 0; i< myPawns().size(); i++) {
+			int current = myPawns().get(i);
+			List<DraughtsMove> possibleCaptures = prisesPossiblesDepuisCase(current, board.isKing(current), -1);
+			if (!possibleCaptures.isEmpty()) {
+				//System.out.println();
+				possibleCaptureMoves.addAll(possibleCaptures);
+			}
+		}
+
+		moves.addAll(possibleCaptureMoves);
 		if(moves.isEmpty()) {
 			moves.addAll(possibleMovesWithoutCapture());
 		}
@@ -455,10 +562,8 @@ public class EnglishDraughts extends Game {
 		// Cast and apply the move
 		DraughtsMove move = (DraughtsMove) aMove;
 		
-		
-		//
-		// TODO implement play
-		//
+
+
 		
 		// Move pawn and capture opponents
 		
@@ -495,11 +600,17 @@ public class EnglishDraughts extends Game {
 		//
 		// TODO implement winner
 		//
-		
+
 		// return the winner ID if possible
+		if (possibleMoves().isEmpty()) {
+			if (playerId == PlayerId.ONE)
+				return PlayerId.TWO;
+			return PlayerId.ONE;
+		} else if (nbKingMovesWithoutCapture >= 25)
+			return PlayerId.NONE;
 		
 		// return PlayerId.NONE if the game is null
-		
+
 		// Return null is the game has not ended yet
 		return null;
 	}

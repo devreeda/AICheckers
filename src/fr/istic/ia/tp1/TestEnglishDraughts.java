@@ -103,7 +103,7 @@ public class TestEnglishDraughts {
 	public void testPossibleMovesMutipleTake() {
 		EnglishDraughts draughts = new EnglishDraughts(8);
 		setBoard(draughts.board, asList(18,19), asList(10), asList(6,8,15), asList(7));
-		
+
 		List<Game.Move> initMoves = asList( 
 				newMove(draughts, asList(10,1)),
 				newMove(draughts, asList(10,3,12)),

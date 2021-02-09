@@ -1,6 +1,7 @@
 package fr.istic.ia.tp1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -263,6 +264,80 @@ public class EnglishDraughts extends Game {
 		return possibleMoves;
 	}
 
+	public ArrayList<Integer> listPossibleCapturesFromSquare(int square) {
+		ArrayList<Integer> possibleMoves = new ArrayList<Integer>();
+		// Check if the player is white so that it goes to the right direction
+		if (playerId.equals(PlayerId.ONE)) { //White
+			int upLeft = board.neighborUpLeft(square);
+			int upRight = board.neighborUpRight(square);
+			//check if the upleft neighbour is black and that the pawn can take it
+			if (board.isBlack(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
+				possibleMoves.add(board.neighborUpLeft(upLeft));
+			}
+			//check if the upright neighbour is black and that the pawn can take it
+			if (board.isBlack(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
+				possibleMoves.add(board.neighborUpLeft(upRight));
+			}
+			// if the pawn is a king, it can also take from the other direction
+			if (board.isKing(square)) {
+				int downLeft = board.neighborDownLeft(square);
+				int downRight = board.neighborDownRight(square);
+
+				if (board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+					possibleMoves.add(board.neighborUpLeft(downLeft));
+				}
+				if (board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+					possibleMoves.add(board.neighborUpLeft(downRight));
+				}
+			}
+		}
+		// check if the player is black so that it goes to the right direction
+		if (playerId.equals(PlayerId.TWO)) {
+			int downLeft = board.neighborDownLeft(square);
+			int downRight = board.neighborDownRight(square);
+
+			if (board.isWhite(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+				possibleMoves.add(board.neighborUpLeft(downLeft));
+			}
+			if (board.isWhite(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+				possibleMoves.add(board.neighborUpLeft(downRight));
+			}
+
+			if (board.isKing(square)) {
+				int upLeft = board.neighborUpLeft(square);
+				int upRight = board.neighborUpRight(square);
+				if (board.isWhite(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
+					possibleMoves.add(board.neighborUpLeft(upLeft));
+				}
+				if (board.isWhite(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
+					possibleMoves.add(board.neighborUpLeft(upRight));
+				}
+			}
+		}
+		return possibleMoves;
+	}
+
+	public ArrayList<DraughtsMove> possibleCapturesFromSquare(int square) {
+		ArrayList<DraughtsMove> moves = new ArrayList<>();
+		List<Integer> possibleDestinations = listPossibleCapturesFromSquare(square);
+		for (int dest : possibleDestinations) {
+			List<DraughtsMove> possibleCaptureDestination = possibleCapturesFromSquare(dest);
+			if (possibleCaptureDestination.isEmpty()) {
+				DraughtsMove move = new DraughtsMove();
+				move.add(square);
+				move.add(dest);
+				moves.add(move);
+			} else {
+				DraughtsMove move = new DraughtsMove();
+				move.add(square);
+				for (DraughtsMove moveDestination : possibleCaptureDestination) {
+					moves.addAll(new ArrayList<>(Arrays.asList(move, moveDestination)));
+				}
+			}
+		}
+		return moves;
+	}
+
 
 	/**
 	 * Generate the list of possible moves
@@ -285,6 +360,7 @@ public class EnglishDraughts extends Game {
 		moves.addAll(possibleCaptureMoves());
 		return moves;
 	}
+
 
 	public ArrayList<Move> possibleMovesWithoutCapture(){
 		ArrayList<Move> moves = new ArrayList<>();

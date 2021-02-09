@@ -256,6 +256,7 @@ public class MonteCarloTreeSearch {
 		visited.add(root.children.get(indexNextNode));
 		
 		// Simulate from new node(s)
+		//TODO Remplacer en utilisant RollOut et modifier le backpropagate en consequence
 		PlayerId winner = playRandomlyToEnd(root.children.get(indexNextNode).game);
 		
 		// Backpropagate results
@@ -280,10 +281,15 @@ public class MonteCarloTreeSearch {
 	 * @return The best move to play from the current MCTS tree state.
 	 */
 	public Move getBestMove() {
-		// 
-		// TODO Implement MCTS getBestMove
-		//
-		return null;
+		List<EvalNode> children = root.children;
+		List<Move> possibleMoves = root.game.possibleMoves();
+		int indexOfBestChildren = -1;
+		double bestScore = 0;
+		for(int i = 0; i < children.size(); i++){
+			if(children.get(i).score() > bestScore) indexOfBestChildren = i;
+		}
+		if (indexOfBestChildren < 0) System.out.println("Erreur getBestMove");
+		return possibleMoves.get(indexOfBestChildren);
 	}
 	
 	

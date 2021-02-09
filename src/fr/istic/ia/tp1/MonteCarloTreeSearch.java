@@ -50,8 +50,8 @@ public class MonteCarloTreeSearch {
 		 * Compute the Upper Confidence Bound for Trees (UCT) value for the node.
 		 * @return UCT value for the node
 		 */
-		double uct(int N) {
-			if (N==0) return this.n/this.w;
+		double uct() {
+			if (n==0) return Integer.MAX_VALUE;
 			else return (w / (double) n) + 1.4142 * Math.sqrt(Math.log(nTotal) / (double) n);
 		}
 		
@@ -229,24 +229,50 @@ public class MonteCarloTreeSearch {
 	 * @return <code>true</code> if there is no need for further exploration (to speed up end of games).
 	 */
 	public boolean evaluateTreeOnce() {
-		//
-		// TODO implement MCTS evaluateTreeOnce
-		//
-		
 		// List of visited nodes
+		List<EvalNode> visited = new ArrayList<EvalNode>();
+		if(nTotal == 0) visited.add(root);
 		
 		// Start from the root
+		List<Move> possiblesMoves =  root.game.possibleMoves();
+		for(int i = 0; i < possiblesMoves.size(); i++){
+			Game possibleGame = root.game.clone();
+			possibleGame.play(possiblesMoves.get(i));
+			root.children.add(new EvalNode(possibleGame));
+		}
+
 		
 		// Selection (with UCT tree policy)
-		
+		int indexNextNode = -1;
+		int biggestUCT = 0;
+		for(int i = 0; i < root.children.size(); i++){
+			if(biggestUCT < root.children.get(i).uct()){
+				indexNextNode = i;
+			}
+		}
+		if(indexNextNode < 0) System.out.println("Index of next node to explore < 0 : Impossible !");
+
 		// Expand node
+		visited.add(root.children.get(indexNextNode));
 		
 		// Simulate from new node(s)
+		PlayerId winner = playRandomlyToEnd(root.children.get(indexNextNode).game);
 		
 		// Backpropagate results
+		for(int i = 0; i < visited.size(); i++){
+			if(i%2 == 0) {
+				visited.get(i).n++;
+				visited.get(i).w++;
+			}
+			else{
+				visited.get(i).n++;
+			}
+		}
 		
 		// Return false if tree evaluation should continue
-		return false;
+		//TODO Changer la condition si necessaire
+		if(visited.size() > 100) return true;
+		else return false;
 	}
 	
 	/**

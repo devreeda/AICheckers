@@ -356,8 +356,10 @@ public class EnglishDraughts extends Game {
 		// - one function that returns the displacement moves from a given position (without capture)
 		//
 		ArrayList<Move> moves = new ArrayList<>();
-		moves.addAll(possibleMovesWithoutCapture());
 		moves.addAll(possibleCaptureMoves());
+		if(moves.isEmpty()) {
+			moves.addAll(possibleMovesWithoutCapture());
+		}
 		return moves;
 	}
 
@@ -461,10 +463,16 @@ public class EnglishDraughts extends Game {
 		// Move pawn and capture opponents
 		
 		// Promote to king if the pawn ends on the opposite of the board
+		int finMovement = move.get(move.size() - 1);
+		if (board.inTopRow(finMovement) && playerId.equals(playerId.ONE)) board.set(finMovement,CheckerBoard.WHITE_KING);
+		if (board.inBottomRow(finMovement) && playerId.equals(playerId.TWO)) board.set(finMovement,CheckerBoard.BLACK_KING);
 		
 		// Next player
+		if(player().equals(playerId.ONE)) playerId = playerId.TWO;
+		else playerId = playerId.ONE;
 		
 		// Update nbTurn
+		nbTurn++;
 		
 		// Keep track of successive moves with kings wthout capture
 

@@ -138,8 +138,7 @@ public class EnglishDraughts extends Game {
 	boolean isEmpty(int square) {
 		return board.isEmpty(square);
 	}
-	//FIXME
-	/** 
+	/**
 	 * Check if a tile is owned by adversary
 	 * @param square Tile number
 	 * @return
@@ -151,8 +150,7 @@ public class EnglishDraughts extends Game {
 			return board.isWhite(square);
 		}
 	}
-	//FIXME
-	/** 
+	/**
 	 * Check if a tile is owned by the current player
 	 * @param square Tile number
 	 * @return
@@ -177,169 +175,15 @@ public class EnglishDraughts extends Game {
 		}
 	}
 
-	/*
-	//FIXME : MA MÉTHODE
-	public List<Move> possibleCaptureMoves() {
-		List<Integer> myPawns = this.myPawns();
-		List<Move> possibleMoves = new ArrayList<Move>();
-
-		// Pour chaque pion
-			// si le coin superieur gauche est occupé par un pion adverse et que le coin superieur gauche de celui ci est vide
-			// ou si le coin superieur droit est occupé par un pion adverse et que le coin superieur droit de celui ci est vide
-				// ajouter le move de prise à la list des possible capture moves
-
-
-		for (Integer pawn : myPawns) {
-			// check if the player is white so that it goes to the right direction
-			if (playerId.equals(PlayerId.ONE)) { //White
-				int upLeft = board.neighborUpLeft(pawn);
-				int upRight = board.neighborUpRight(pawn);
-				//check if the upleft neighbour is black and that the pawn can take it
-				if (upLeft != 0 && board.isBlack(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
-					DraughtsMove move = new DraughtsMove();
-					move.add(pawn);
-					move.add(board.neighborUpLeft(upLeft));
-					possibleMoves.add(move);
-				}
-				//check if the upright neighbour is black and that the pawn can take it
-				if (upRight != 0 && board.isBlack(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
-					DraughtsMove move = new DraughtsMove();
-					move.add(pawn);
-					move.add(board.neighborUpLeft(upRight));
-					possibleMoves.add(move);
-				}
-				// if the pawn is a king, it can also take from the other direction
-				if (board.isKing(pawn)) {
-					int downLeft = board.neighborDownLeft(pawn);
-					int downRight = board.neighborDownRight(pawn);
-
-					if (downLeft != 0 && board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
-						DraughtsMove move = new DraughtsMove();
-						move.add(pawn);
-						move.add(board.neighborUpLeft(downLeft));
-						possibleMoves.add(move);
-					}
-					if (downRight != 0 && board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
-						DraughtsMove move = new DraughtsMove();
-						move.add(pawn);
-						move.add(board.neighborUpLeft(downRight));
-						possibleMoves.add(move);
-					}
-				}
-			}
-			// check if the player is black so that it goes to the right direction
-			if (playerId.equals(PlayerId.TWO)) {
-				int downLeft = board.neighborDownLeft(pawn);
-				int downRight = board.neighborDownRight(pawn);
-
-				if (downLeft != 0 && board.isWhite(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
-					DraughtsMove move = new DraughtsMove();
-					move.add(pawn);
-					move.add(board.neighborUpLeft(downLeft));
-					possibleMoves.add(move);
-				}
-				if (downRight != 0 && board.isWhite(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
-					DraughtsMove move = new DraughtsMove();
-					move.add(pawn);
-					move.add(board.neighborUpLeft(downRight));
-					possibleMoves.add(move);
-				}
-
-				if (board.isKing(pawn)) {
-					int upLeft = board.neighborUpLeft(pawn);
-					int upRight = board.neighborUpRight(pawn);
-					if (upLeft != 0 && board.isWhite(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
-						DraughtsMove move = new DraughtsMove();
-						move.add(pawn);
-						move.add(board.neighborUpLeft(upLeft));
-						possibleMoves.add(move);
-					}
-					if (upRight != 0 && board.isWhite(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
-						DraughtsMove move = new DraughtsMove();
-						move.add(pawn);
-						move.add(board.neighborUpLeft(upRight));
-						possibleMoves.add(move);
-					}
-				}
-			}
-		}
-		return possibleMoves;
-	}
-
-	public ArrayList<Integer> listPossibleCapturesFromSquare(int square) {
-		ArrayList<Integer> possibleMoves = new ArrayList<Integer>();
-		// Check if the player is white so that it goes to the right direction
-		if (playerId.equals(PlayerId.ONE)) { //White
-			int upLeft = board.neighborUpLeft(square);
-			int upRight = board.neighborUpRight(square);
-			//check if the upleft neighbour is black and that the pawn can take it
-			if (board.isBlack(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
-				possibleMoves.add(board.neighborUpLeft(upLeft));
-			}
-			//check if the upright neighbour is black and that the pawn can take it
-			if (board.isBlack(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
-				possibleMoves.add(board.neighborUpLeft(upRight));
-			}
-			// if the pawn is a king, it can also take from the other direction
-			if (board.isKing(square)) {
-				int downLeft = board.neighborDownLeft(square);
-				int downRight = board.neighborDownRight(square);
-
-				if (board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
-					possibleMoves.add(board.neighborUpLeft(downLeft));
-				}
-				if (board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
-					possibleMoves.add(board.neighborUpLeft(downRight));
-				}
-			}
-		}
-		// check if the player is black so that it goes to the right direction
-		if (playerId.equals(PlayerId.TWO)) {
-			int downLeft = board.neighborDownLeft(square);
-			int downRight = board.neighborDownRight(square);
-
-			if (board.isWhite(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
-				possibleMoves.add(board.neighborUpLeft(downLeft));
-			}
-			if (board.isWhite(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
-				possibleMoves.add(board.neighborUpLeft(downRight));
-			}
-
-			if (board.isKing(square)) {
-				int upLeft = board.neighborUpLeft(square);
-				int upRight = board.neighborUpRight(square);
-				if (board.isWhite(upLeft) && board.isEmpty(board.neighborUpLeft(upLeft))) {
-					possibleMoves.add(board.neighborUpLeft(upLeft));
-				}
-				if (board.isWhite(upRight) && board.isEmpty(board.neighborUpRight(upRight))) {
-					possibleMoves.add(board.neighborUpLeft(upRight));
-				}
-			}
-		}
-		return possibleMoves;
-	}
-
-	public ArrayList<DraughtsMove> possibleCapturesFromSquare(int square) {
-		ArrayList<DraughtsMove> moves = new ArrayList<>();
-		List<Integer> possibleDestinations = listPossibleCapturesFromSquare(square);
-		for (int dest : possibleDestinations) {
-			List<DraughtsMove> possibleCaptureDestination = possibleCapturesFromSquare(dest);
-			if (possibleCaptureDestination.isEmpty()) {
-				DraughtsMove move = new DraughtsMove();
-				move.add(square);
-				move.add(dest);
-				moves.add(move);
-			} else {
-				DraughtsMove move = new DraughtsMove();
-				move.add(square);
-				for (DraughtsMove moveDestination : possibleCaptureDestination) {
-					moves.addAll(new ArrayList<>(Arrays.asList(move, moveDestination)));
-				}
-			}
-		}
-		return moves;
-	}
-*/
+	/**
+	 * Liste les sauts possibles depuis une case. Prends en compte le fait que ce soit un roi ou non afin de savoir
+	 * si il peut capturer des deux sens. Il prends aussi en paramètres la dernière destination afin d'éviter toute
+	 * répétition.
+	 * @param pawn
+	 * @param isKing
+	 * @param lastDestination
+	 * @return
+	 */
 	List<Integer> listeDestinationsSautsPossiblesDepuisCase(int pawn, boolean isKing, int lastDestination) {
 		ArrayList<Integer> dest = new ArrayList<>();
 		// check if the player is white so that it goes to the right direction
@@ -409,6 +253,13 @@ public class EnglishDraughts extends Game {
 		return dest;
 	}
 
+	/**
+	 * Liste les prisees possibles depuis une case en prenant en compte les prises multiples
+	 * @param square
+	 * @param isKing
+	 * @param lastDestination
+	 * @return
+	 */
 	List<DraughtsMove> prisesPossiblesDepuisCase(int square, boolean isKing, int lastDestination) {
 		List<DraughtsMove> moves = new ArrayList<>();
 		List<Integer> destSauts = listeDestinationsSautsPossiblesDepuisCase(square, isKing, lastDestination);

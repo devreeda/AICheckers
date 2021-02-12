@@ -24,18 +24,17 @@ public class MonteCarloTreeSearch {
 	class EvalNode {
 		/** The number of simulations run through this node */
 		int n;
-		
+
 		/** The number of winning runs */
 		double w;
-		
+
 		/** The game state corresponding to this node */
 		Game game;
-		
+
 		/** The children of the node: the games states accessible by playing a move from this node state */
 		ArrayList<EvalNode> children;
 
-		
-		/** 
+		/**
 		 * The only constructor of EvalNode.
 		 * @param game The game state corresponding to this node.
 		 */
@@ -45,35 +44,40 @@ public class MonteCarloTreeSearch {
 			w = 0.0;
 			n = 0;
 		}
-		
+
 		/**
 		 * Compute the Upper Confidence Bound for Trees (UCT) value for the node.
 		 * @return UCT value for the node
 		 */
 		double uct() {
-			if (n==0) return Integer.MAX_VALUE;
-			else return (w / (double) n) + 1.4142 * Math.sqrt(Math.log(nTotal) / (double) n);
+			//
+			// TODO implement the UCT function (Upper Confidence Bound for Trees)
+			//
+			return 0.0;
 		}
-		
+
 		/**
 		 * "Score" of the node, i.e estimated probability of winning when moving to this node
 		 * @return Estimated probability of win for the node
 		 */
 		double score() {
-			return (w/n);
+			//
+			// TODO implement the score function for a node
+			//
+			return 0.0;
 		}
-		
+
 		/**
 		 * Update the stats (n and w) of the node with the provided rollout results
 		 * @param res
 		 */
 		void updateStats(RolloutResults res) {
-			this.n = res.nbSimulations();
-			//TODO A verifier
-			this.w = res.nbWins(game.player());
+			//
+			// TODO implement updateStats for a node
+			//
 		}
 	}
-	
+
 	/**
 	 * A class to hold the results of the rollout phase
 	 * Keeps the number of wins for each player and the number of simulations.
@@ -83,20 +87,20 @@ public class MonteCarloTreeSearch {
 	static class RolloutResults {
 		/** The number of wins for player 1 {@link PlayerId#ONE}*/
 		double win1;
-		
+
 		/** The number of wins for player 2 {@link PlayerId#TWO}*/
 		double win2;
-		
+
 		/** The number of playouts */
 		int n;
-		
+
 		/**
 		 * The constructor
 		 */
 		public RolloutResults() {
 			reset();
 		}
-		
+
 		/**
 		 * Reset results
 		 */
@@ -105,7 +109,7 @@ public class MonteCarloTreeSearch {
 			win1 = 0.0;
 			win2 = 0.0;
 		}
-		
+
 		/**
 		 * Add other results to this
 		 * @param res The results to add
@@ -115,21 +119,18 @@ public class MonteCarloTreeSearch {
 			win2 += res.win2;
 			n += res.n;
 		}
-		
+
 		/**
 		 * Update playout statistics with a win of the player <code>winner</code>
 		 * Also handles equality if <code>winner</code>={@link PlayerId#NONE}, adding 0.5 wins to each player
 		 * @param winner
 		 */
 		public void update(PlayerId winner) {
- 			if(winner.equals(PlayerId.ONE)) this.win1++;
-			if(winner.equals(PlayerId.TWO)) this.win2++;
-			if(winner.equals(PlayerId.NONE)) {
-				this.win1 = this.win1 + 0.5;
-				this.win2 = this.win2 + 0.5;
-			}
+			//
+			// TODO implement the update of RolloutResults
+			//
 		}
-		
+
 		/**
 		 * Getter for the number of wins of a player
 		 * @param playerId
@@ -137,12 +138,12 @@ public class MonteCarloTreeSearch {
 		 */
 		public double nbWins(PlayerId playerId) {
 			switch (playerId) {
-			case ONE: return win1;
-			case TWO: return win2;
-			default: return 0.0;
+				case ONE: return win1;
+				case TWO: return win2;
+				default: return 0.0;
 			}
 		}
-		
+
 		/**
 		 * Getter for the number of simulations
 		 * @return The number of playouts
@@ -151,18 +152,18 @@ public class MonteCarloTreeSearch {
 			return n;
 		}
 	}
-	
+
 	/**
 	 * The root of the MCTS tree
 	 */
 	EvalNode root;
-	
+
 	/**
 	 * The total number of performed simulations (rollouts)
 	 */
 	int nTotal;
 
-	
+
 	/**
 	 * The constructor
 	 * @param game
@@ -171,20 +172,17 @@ public class MonteCarloTreeSearch {
 		root = new EvalNode(game.clone());
 		nTotal = 0;
 	}
-	
+
 	/**
 	 * Perform a single random playing rollout from the given game state
 	 * @param game Initial game state. {@code game} will contain an ended game state when the function returns.
 	 * @return The PlayerId of the winner (or NONE if equality or timeout).
 	 */
 	static PlayerId playRandomlyToEnd(Game game) {
-		System.out.println(game.toString());
-		while(game.winner() == null){
-			System.out.println("BouclePlayRandom " + game.view());
-			Player bot = new PlayerRandom();
-			game.play(bot.play(game));
-		}
-		return game.winner();
+		//
+		// TODO implement playRandomlyToEnd
+		//
+		return null;
 	}
 
 	/**
@@ -194,11 +192,10 @@ public class MonteCarloTreeSearch {
 	 * @return A RolloutResults object containing the number of wins for each player and the number of simulations
 	 */
 	static RolloutResults rollOut(final Game game, int nbRuns) {
-		RolloutResults roll = new RolloutResults();
-		for(int i = 0; i < nbRuns; i++){
-			roll.update(playRandomlyToEnd(game));
-		}
-		return roll;
+		//
+		// TODO implement rollOut
+		//
+		return null;
 	}
 
 	/**
@@ -222,8 +219,8 @@ public class MonteCarloTreeSearch {
 
 		// Print some statistics
 		System.out.println("Stopped search after "
-		       + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) + " ms. "
-		       + "Root stats is " + root.w + "/" + root.n + String.format(" (%.2f%% loss)", 100.0*root.w/root.n));
+				+ TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) + " ms. "
+				+ "Root stats is " + root.w + "/" + root.n + String.format(" (%.2f%% loss)", 100.0*root.w/root.n));
 	}
 
 	/**
@@ -231,77 +228,24 @@ public class MonteCarloTreeSearch {
 	 * @return <code>true</code> if there is no need for further exploration (to speed up end of games).
 	 */
 	public boolean evaluateTreeOnce() {
-		// List of visited nodes
-		List<EvalNode> visited = new ArrayList<EvalNode>();
-		if(nTotal == 0) visited.add(root);
-		for(int i = 0; i < root.children.size(); i++){
-			if(root.children.get(i).n != 0){
-				visited.add(root.children.get(i));
-			}
-		}
+		//
+		// TODO implement MCTS evaluateTreeOnce
+		//
 
+		// List of visited nodes
 
 		// Start from the root
-			List<Move> possiblesMoves = root.game.possibleMoves();
-			for (int i = 0; i < possiblesMoves.size(); i++) {
-				Game possibleGame = root.game.clone();
-				possibleGame.play(possiblesMoves.get(i));
-				root.children.add(new EvalNode(possibleGame));
-			}
-
-
 
 		// Selection (with UCT tree policy)
-		int indexNextNode = -1;
-		int biggestUCT = 0;
-		for(int i = 0; i < root.children.size(); i++){
-			if(biggestUCT < root.children.get(i).uct()){
-				indexNextNode = i;
-			}
-		}
-		if(indexNextNode < 0) System.out.println("Index of next node to explore < 0 : Impossible !");
 
 		// Expand node
-		visited.add(root.children.get(indexNextNode));
-		System.out.println("Nombre de noeud dans visited : " + visited.size());
 
 		// Simulate from new node(s)
-		System.out.println("Let's simulate ! ");
-		//PlayerId winner = playRandomlyToEnd(root.children.get(indexNextNode).game);
-		RolloutResults rollout = rollOut(root.children.get(indexNextNode).game,10);
-		System.out.println("Résultat rollOut : win1:" + rollout.win1 + " win2:" +rollout.win2);
 
-		System.out.println("Let's backpropagate ! ");
 		// Backpropagate results
-		for(int i = 0; i < visited.size(); i++){
-			if(i == 0%2 ) {
-				visited.get(i).w = visited.get(i).w + rollout.win1;
-			}
-			else {
-				visited.get(i).w = visited.get(i).w + rollout.win2;
-			}
-			visited.get(i).n = visited.get(i).n + rollout.n;
-		}
-		System.out.println("Stats root :" + root.w + "/" + root.n);
-		/*
-		if(winner.equals(PlayerId.ONE)){
-			for(int i = 0; i < visited.size(); i++){
-				visited.get(i)
-				if(i%2 == 0) {
-					visited.get(i).n++;
-					visited.get(i).w++;
-				}
-				else{
-					visited.get(i).n++;
-				}
-			}
-		}*/
 
-		System.out.println("Let's explore ! ");
 		// Return false if tree evaluation should continue
-		//TODO Changer la condition si necessaire
-		nTotal+= 10;
-		return root.children.isEmpty();
+		return false;
 	}
 
 	/**
@@ -309,20 +253,13 @@ public class MonteCarloTreeSearch {
 	 * @return The best move to play from the current MCTS tree state.
 	 */
 	public Move getBestMove() {
-		System.out.println("Recherche du meilleur coups possible ..");
-		List<EvalNode> children = root.children;
-		List<Move> possibleMoves = root.game.possibleMoves();
-		int indexOfBestChildren = -1;
-		double bestScore = 0;
-		for(int i = 0; i < children.size(); i++){
-			if(children.get(i).score() > bestScore) indexOfBestChildren = i;
-		}
-		System.out.println("Le meilleur move est :" + bestScore + " fois gagné" );
-		if (indexOfBestChildren < 0) System.out.println("Erreur getBestMove");
-		return possibleMoves.get(indexOfBestChildren);
+		//
+		// TODO Implement MCTS getBestMove
+		//
+		return null;
 	}
-	
-	
+
+
 	/**
 	 * Get a few stats about the MTS tree and the possible moves scores
 	 * @return A string containing MCTS stats

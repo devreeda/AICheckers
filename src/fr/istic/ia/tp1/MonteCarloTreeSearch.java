@@ -50,10 +50,10 @@ public class MonteCarloTreeSearch {
 		 * @return UCT value for the node
 		 */
 		double uct() {
-			//
-			// TODO implement the UCT function (Upper Confidence Bound for Trees)
-			//
-			return 0.0;
+			if (n == 0)
+				return Integer.MAX_VALUE;
+			return ((double) w / (double) n)
+					+ 1.41 * Math.sqrt(Math.log(totalVisit) / (double) nodeVisit);
 		}
 
 		/**

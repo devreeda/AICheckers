@@ -417,8 +417,8 @@ public class EnglishDraughts extends Game {
 		List<Move> possibleMoves = possibleMoves();
 
 		boolean captured = false;
-		byte current = board.get(move.get(0));
-		boolean isKing = board.isKing(current);
+		int current = board.get(move.get(0));
+		boolean isKing = board.isKing(move.get(0));
 
 		if (possibleMoves.contains(move)) {
 			board.set(move.get(0), CheckerBoard.EMPTY);
@@ -426,34 +426,33 @@ public class EnglishDraughts extends Game {
 				board.set(move.get(move.size()-1), CheckerBoard.WHITE_KING);
 			else if (isKing && playerId == PlayerId.TWO)
 				board.set(move.get(move.size()-1), CheckerBoard.BLACK_KING);
-			else board.set(move.get(move.size()-1), current);
+			else board.set(move.get(move.size()-1), (byte)current);
 			//capture
 			for (int i = 1; i<move.size(); ++i) {
 				if (board.neighborDownRight(board.neighborDownRight(move.get(i-1))) == move.get(i)) {
 					board.set(board.neighborDownRight(move.get(i-1)), CheckerBoard.EMPTY);
 					captured = true;
-					nbKingMovesWithoutCapture = 0;
 				}
 				if (board.neighborDownLeft(board.neighborDownLeft(move.get(i-1))) == move.get(i)) {
 					board.set(board.neighborDownLeft(move.get(i-1)), CheckerBoard.EMPTY);
 					captured = true;
-					nbKingMovesWithoutCapture = 0;
 				}
 				if (board.neighborUpRight(board.neighborUpRight(move.get(i-1))) == move.get(i)) {
 					board.set(board.neighborUpRight(move.get(i-1)), CheckerBoard.EMPTY);
 					captured = true;
-					nbKingMovesWithoutCapture = 0;
 				}
 				if (board.neighborUpLeft(board.neighborUpLeft(move.get(i-1))) == move.get(i)) {
 					board.set(board.neighborUpLeft(move.get(i-1)), CheckerBoard.EMPTY);
 					captured = true;
-					nbKingMovesWithoutCapture = 0;
 				}
 			}
 
 		}
-		if (!captured)
+
+		if (!captured && isKing) {
 			nbKingMovesWithoutCapture++;
+		}
+		else nbKingMovesWithoutCapture = 0;
 
 		// Promote to king if the pawn ends on the opposite of the board
 		int finMovement = move.get(move.size() - 1);

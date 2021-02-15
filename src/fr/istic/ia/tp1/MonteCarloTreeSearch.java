@@ -70,7 +70,9 @@ public class MonteCarloTreeSearch {
 			n += res.n;
 			if (this.game.player() == PlayerId.ONE)
 				w += res.win1;
-			else w += res.win2;
+			else if (this.game.player() == PlayerId.TWO)
+				w += res.win2;
+			else w += 0.5;
 		}
 	}
 
@@ -122,9 +124,11 @@ public class MonteCarloTreeSearch {
 		 * @param winner
 		 */
 		public void update(PlayerId winner) {
-			//
-			// TODO implement the update of RolloutResults
-			//
+			if (winner == PlayerId.ONE) win1 += 1;
+			else if (winner == PlayerId.TWO) win2 += 1;
+			else {
+				win1 += 0.5; win2 += 0.5;
+			}
 		}
 
 		/**

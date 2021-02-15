@@ -124,8 +124,8 @@ public class MonteCarloTreeSearch {
 		 * @param winner
 		 */
 		public void update(PlayerId winner) {
-			if (winner == PlayerId.ONE) win1 += 1;
-			else if (winner == PlayerId.TWO) win2 += 1;
+			if (winner == PlayerId.ONE) win1++;
+			else if (winner == PlayerId.TWO) win2++;
 			else {
 				win1 += 0.5; win2 += 0.5;
 			}

@@ -179,10 +179,13 @@ public class MonteCarloTreeSearch {
 	 * @return The PlayerId of the winner (or NONE if equality or timeout).
 	 */
 	static PlayerId playRandomlyToEnd(Game game) {
-		//
-		// TODO implement playRandomlyToEnd
-		//
-		return null;
+		System.out.println(game.toString());
+		while(game.winner() == null){
+			System.out.println("BouclePlayRandom " + game.view());
+			Player bot = new PlayerRandom();
+			game.play(bot.play(game));
+		}
+		return game.winner();
 	}
 
 	/**

@@ -210,11 +210,11 @@ public class EnglishDraughts extends Game {
 				//System.out.println(downRight);
 				//System.out.println(downLeft);
 
-				if (downLeft > 0 && board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
+				if (downLeft > 0 && board.neighborDownLeft(downLeft) > 0 && board.isBlack(downLeft) && board.isEmpty(board.neighborDownLeft(downLeft))) {
 					if (board.neighborDownLeft(downLeft) != lastDestination)
 						dest.add(board.neighborDownLeft(downLeft));
 				}
-				if (downRight > 0 && board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
+				if (downRight > 0 && board.neighborDownRight(downRight) > 0 && board.isBlack(downRight) && board.isEmpty(board.neighborDownRight(downRight))) {
 					if (board.neighborDownRight(downRight) != lastDestination)
 						dest.add(board.neighborDownRight(downRight));
 				}

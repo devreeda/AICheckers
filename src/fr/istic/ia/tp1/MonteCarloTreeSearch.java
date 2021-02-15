@@ -306,10 +306,12 @@ public class MonteCarloTreeSearch {
 		double bestScore = 0;
 		System.out.println("ROOT POSSEDE " + root.children.size() + " FILS");
 		for(int i = 0; i < children.size(); i++){
-			if(children.get(i).w > bestScore) indexOfBestChildren = i;
+			if(children.get(i).w >= bestScore) indexOfBestChildren = i;
 		}
 		System.out.println("Le meilleur move est :" + bestScore + " fois gagné" );
-		if (indexOfBestChildren < 0) System.out.println("Erreur getBestMove");
+		if (indexOfBestChildren < 0) {
+			System.out.println("Erreur getBestMove");
+		}
 		return possibleMoves.get(indexOfBestChildren);
 	}
 	

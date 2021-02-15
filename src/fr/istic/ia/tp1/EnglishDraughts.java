@@ -346,13 +346,13 @@ public class EnglishDraughts extends Game {
 					if (board.isKing(current)) {//WhiteKing
 						int downLeft = board.neighborDownLeft(current);
 						int downRight = board.neighborDownRight(current);
-						if (upRight != 0 && board.isEmpty(downLeft)) {
+						if (downLeft != 0 && board.isEmpty(downLeft)) {
 							DraughtsMove move1 = new DraughtsMove();
 							move1.add(current);
 							move1.add(downLeft);
 							moves.add( move1);
 						}
-						if (upRight != 0 && board.isEmpty(downRight)) {
+						if (downRight != 0 && board.isEmpty(downRight)) {
 							DraughtsMove move1 = new DraughtsMove();
 							move1.add(current);
 							move1.add(downRight);

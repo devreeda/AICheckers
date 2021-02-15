@@ -50,10 +50,8 @@ public class MonteCarloTreeSearch {
 		 * @return UCT value for the node
 		 */
 		double uct() {
-			if (n == 0)
-				return Integer.MAX_VALUE;
-			return ((double) w / (double) n)
-					+ 1.41 * Math.sqrt(Math.log(totalVisit) / (double) nodeVisit);
+			if (n==0) return Integer.MAX_VALUE;
+			else return (w / (double) n) + 1.4142 * Math.sqrt(Math.log(nTotal) / (double) n);
 		}
 
 		/**
@@ -61,10 +59,9 @@ public class MonteCarloTreeSearch {
 		 * @return Estimated probability of win for the node
 		 */
 		double score() {
-			//
-			// TODO implement the score function for a node
-			//
-			return 0.0;
+			if (n == 0)
+				return Integer.MAX_VALUE;
+			return w/n;
 		}
 
 		/**

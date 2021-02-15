@@ -3,6 +3,7 @@ package fr.istic.ia.tp1;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import fr.istic.ia.tp1.Game.Move;
@@ -128,6 +129,7 @@ public class MonteCarloTreeSearch {
 				this.win1 = this.win1 + 0.5;
 				this.win2 = this.win2 + 0.5;
 			}
+			this.n++;
 		}
 		
 		/**
@@ -231,20 +233,24 @@ public class MonteCarloTreeSearch {
 	 */
 	public boolean evaluateTreeOnce() {
 		// List of visited nodes
+		// --- visités = new List <EvalNode >()
 		List<EvalNode> visited = new ArrayList<EvalNode>();
+		//--- visités.add( node )
 		visited.add(root);
 
 		// Start from the root
+		// --- node = racine
 		EvalNode node = root;
 
 
 		// Selection (with UCT tree policy)
 		while(!node.children.isEmpty()){
 			int indexNextNode = -1;
-			int biggestUCT = 0;
+			double biggestUCT = 0;
 			for(int i = 0; i < root.children.size(); i++){
 				if(biggestUCT < root.children.get(i).uct()){
 					indexNextNode = i;
+					biggestUCT = root.children.get(i).uct();
 				}
 			}
 			visited.add(node);
@@ -252,39 +258,53 @@ public class MonteCarloTreeSearch {
 		}
 
 		// Expand node
-		Player sonCreator = new PlayerRandom();
+		// Player sonCreator = new PlayerRandom();
 		Game newGame = node.game.clone();
 		//TODO Faire un véritable move au hasard
 		//Si il n'est plus possible de créer un fils on ne continue pas
-		if(newGame.possibleMoves().isEmpty()) return true;
-		Move newMove = sonCreator.play(newGame);
-		newGame.play(newMove);
-		EvalNode newFils = new EvalNode(newGame);
-		node.children.add(newFils);
-		visited.add(node);
-		node = newFils;
+		//if(node.game.possibleMoves().isEmpty()) return true;
+		List<Move> moveList = node.game.possibleMoves();
+		for(int i = 0; i < moveList.size(); i ++){
+			//Move newMove = sonCreator.play(newGame);
+			newGame.play(moveList.get(i));
+			EvalNode newFils = new EvalNode(newGame);
+			node.children.add(newFils);
+		}
+		//newGame.play(newMove);
+		//EvalNode newFils = new EvalNode(newGame);
+		if(node.children.size() == 0) return true;
+		Random rand = new Random();
+		EvalNode nextExpansion = node.children.get(rand.nextInt(node.children.size()));
+		visited.add(nextExpansion);
+		node = nextExpansion;
 
 		// Simulate from new node(s)
 		System.out.println("Let's simulate ! ");
 		//PlayerId winner = playRandomlyToEnd(root.children.get(indexNextNode).game);
-		RolloutResults rollout = rollOut(node.game,1);
+		RolloutResults rollout = rollOut(node.game,10);
 		//RolloutResults rollout = rollOut(root.children.get(indexNextNode).game,10);
-		System.out.println("Résultat rollOut : win1:" + rollout.win1 + " win2:" +rollout.win2);
+		System.out.println("Résultat rollOut : win1:" + rollout.win1 + " win2:" +rollout.win2 + " n: " + rollout.n);
 
 		System.out.println("Let's backpropagate ! ");
 		// Backpropagate results
 		for(int i = 0; i < visited.size(); i++){
+			EvalNode tmp = visited.get(i);
 			System.out.println(visited.size() + " : " +  i%2);
 			if((i %2) == 0 ) {
-				visited.get(i).w = visited.get(i).w + rollout.win1;
+				tmp.w = (int) (tmp.w + rollout.win1);
+				//visited.get(i).w = visited.get(i).w + rollout.win1;
 				System.out.println("Victoire du noeud visited :"+visited.get(i).w);
 			}
 			else {
-				visited.get(i).w = visited.get(i).w + rollout.win2;
+				tmp.w = (int) (tmp.w + rollout.win2);
+				//visited.get(i).w = visited.get(i).w + rollout.win2;
 			}
-			visited.get(i).n = visited.get(i).n + rollout.n;
+			tmp.n = (int) (tmp.n + rollout.n);
+			System.out.println("tmp.n = " + tmp.n);
+			//visited.get(i).n = visited.get(i).n + rollout.n;
+			visited.set(i,tmp);
 		}
-		System.out.println("Stats root :" + root.w + "/" + root.n);
+		System.out.println("Stats root :" + visited.get(0).w + "/" + visited.get(0).n);
 
 
 		System.out.println("Let's explore ! ");
@@ -303,10 +323,13 @@ public class MonteCarloTreeSearch {
 		List<EvalNode> children = root.children;
 		List<Move> possibleMoves = root.game.possibleMoves();
 		int indexOfBestChildren = -1;
-		double bestScore = 0;
+		double bestScore = 10000000;
 		System.out.println("ROOT POSSEDE " + root.children.size() + " FILS");
 		for(int i = 0; i < children.size(); i++){
-			if(children.get(i).w >= bestScore) indexOfBestChildren = i;
+			if(children.get(i).w <= bestScore) {
+				bestScore = children.get(i).w;
+				indexOfBestChildren = i;
+			}
 		}
 		System.out.println("Le meilleur move est :" + bestScore + " fois gagné" );
 		if (indexOfBestChildren < 0) {

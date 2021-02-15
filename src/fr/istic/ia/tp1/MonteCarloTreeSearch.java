@@ -67,9 +67,10 @@ public class MonteCarloTreeSearch {
 		 * @param res
 		 */
 		void updateStats(RolloutResults res) {
-			//
-			// TODO implement updateStats for a node
-			//
+			n = res.n;
+			if (this.game.player() == PlayerId.ONE)
+				w = res.win1;
+			else w = res.win2;
 		}
 	}
 

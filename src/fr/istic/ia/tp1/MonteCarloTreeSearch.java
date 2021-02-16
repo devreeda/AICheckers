@@ -244,7 +244,7 @@ public class MonteCarloTreeSearch {
 
 		// Selection (with UCT tree policy)
 		while(!node.children.isEmpty()){
-			int indexNextNode = -1;
+			int indexNextNode = 0;
 			double biggestUCT = 0;
 			for(int i = 0; i < node.children.size() ; i++){
 				if(biggestUCT < node.children.get(i).uct()){
@@ -252,8 +252,8 @@ public class MonteCarloTreeSearch {
 					biggestUCT = node.children.get(i).uct();
 				}
 			}
-			visited.add(node);
 			node = node.children.get(indexNextNode);
+			visited.add(node);
 		}
 
 		// Expand node

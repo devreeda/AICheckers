@@ -61,6 +61,7 @@ public class MonteCarloTreeSearch {
 		 * @return Estimated probability of win for the node
 		 */
 		double score() {
+			if (n==0) return Integer.MAX_VALUE;
 			return (w/n);
 		}
 		

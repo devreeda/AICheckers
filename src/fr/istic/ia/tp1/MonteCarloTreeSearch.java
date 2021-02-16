@@ -181,7 +181,6 @@ public class MonteCarloTreeSearch {
 	 */
 	static PlayerId playRandomlyToEnd(Game game) {
 		while(game.winner() == null){
-			System.out.println("BouclePlayRandom " + game.view());
 			Player bot = new PlayerRandom();
 			game.play(bot.play(game));
 		}
@@ -247,10 +246,10 @@ public class MonteCarloTreeSearch {
 		while(!node.children.isEmpty()){
 			int indexNextNode = -1;
 			double biggestUCT = 0;
-			for(int i = 0; i < root.children.size(); i++){
-				if(biggestUCT < root.children.get(i).uct()){
+			for(int i = 0; i < node.children.size() ; i++){
+				if(biggestUCT < node.children.get(i).uct()){
 					indexNextNode = i;
-					biggestUCT = root.children.get(i).uct();
+					biggestUCT = node.children.get(i).uct();
 				}
 			}
 			visited.add(node);
@@ -258,59 +257,49 @@ public class MonteCarloTreeSearch {
 		}
 
 		// Expand node
-		// Player sonCreator = new PlayerRandom();
-		Game newGame = node.game.clone();
-		//TODO Faire un véritable move au hasard
 		//Si il n'est plus possible de créer un fils on ne continue pas
-		//if(node.game.possibleMoves().isEmpty()) return true;
+		//System.out.println("MOVE POSSIBLE :" + node.game.possibleMoves().size() + node.game.view());
+		if(node.game.possibleMoves().isEmpty()) return true;
 		List<Move> moveList = node.game.possibleMoves();
 		for(int i = 0; i < moveList.size(); i ++){
-			//Move newMove = sonCreator.play(newGame);
+			Game newGame = node.game.clone();
 			newGame.play(moveList.get(i));
 			EvalNode newFils = new EvalNode(newGame);
 			node.children.add(newFils);
 		}
-		//newGame.play(newMove);
-		//EvalNode newFils = new EvalNode(newGame);
-		if(node.children.size() == 0) return true;
-		Random rand = new Random();
+		if(node.children.isEmpty()) return true;
+		Random rand = new Random(); // On descend dans un fils random
 		EvalNode nextExpansion = node.children.get(rand.nextInt(node.children.size()));
 		visited.add(nextExpansion);
 		node = nextExpansion;
 
 		// Simulate from new node(s)
-		System.out.println("Let's simulate ! ");
-		//PlayerId winner = playRandomlyToEnd(root.children.get(indexNextNode).game);
-		RolloutResults rollout = rollOut(node.game,10);
-		//RolloutResults rollout = rollOut(root.children.get(indexNextNode).game,10);
-		System.out.println("Résultat rollOut : win1:" + rollout.win1 + " win2:" +rollout.win2 + " n: " + rollout.n);
+		RolloutResults rollout = rollOut(node.game.clone(),1);
+		//System.out.println("Résultat rollOut : win1:" + rollout.win1 + " win2:" +rollout.win2 + " n: " + rollout.n);
 
-		System.out.println("Let's backpropagate ! ");
+		//System.out.println("Let's backpropagate ! ");
 		// Backpropagate results
 		for(int i = 0; i < visited.size(); i++){
 			EvalNode tmp = visited.get(i);
-			System.out.println(visited.size() + " : " +  i%2);
+			//System.out.println(visited.size() + " : " +  i%2);
 			if((i %2) == 0 ) {
 				tmp.w = (int) (tmp.w + rollout.win1);
-				//visited.get(i).w = visited.get(i).w + rollout.win1;
-				System.out.println("Victoire du noeud visited :"+visited.get(i).w);
+				//System.out.println("Victoire du noeud visited :"+visited.get(i).w);
 			}
 			else {
 				tmp.w = (int) (tmp.w + rollout.win2);
-				//visited.get(i).w = visited.get(i).w + rollout.win2;
 			}
 			tmp.n = (int) (tmp.n + rollout.n);
-			System.out.println("tmp.n = " + tmp.n);
-			//visited.get(i).n = visited.get(i).n + rollout.n;
+			//System.out.println("tmp.n = " + tmp.n);
 			visited.set(i,tmp);
 		}
-		System.out.println("Stats root :" + visited.get(0).w + "/" + visited.get(0).n);
+		//System.out.println("Stats root :" + visited.get(0).w + "/" + visited.get(0).n);
 
 
-		System.out.println("Let's explore ! ");
+		//System.out.println("Let's explore ! POSSIBLES MOVES DEPUIS FEUILLE " + node.game.possibleMoves().size() );
 		// Return false if tree evaluation should continue
 		//TODO Changer la condition si necessaire
-		nTotal+= 10;
+		nTotal+= 1;
 		return false;
 	}
 
@@ -325,7 +314,7 @@ public class MonteCarloTreeSearch {
 		int indexOfBestChildren = -1;
 		double bestScore = 10000000;
 		System.out.println("ROOT POSSEDE " + root.children.size() + " FILS");
-		for(int i = 0; i < children.size(); i++){
+		for(int i = 0; i < children.size() ; i++){
 			if(children.get(i).w <= bestScore) {
 				bestScore = children.get(i).w;
 				indexOfBestChildren = i;

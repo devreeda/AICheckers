@@ -260,13 +260,14 @@ public class EnglishDraughts extends Game {
 	 * @param lastDestination
 	 * @return
 	 */
-	List<DraughtsMove> prisesPossiblesDepuisCase(int square, boolean isKing, int lastDestination) {
+	List<DraughtsMove> prisesPossiblesDepuisCase(int square, boolean isKing, int lastDestination, int iteration) {
 		List<DraughtsMove> moves = new ArrayList<>();
 		List<Integer> destSauts = listeDestinationsSautsPossiblesDepuisCase(square, isKing, lastDestination);
 		//System.out.println(destSauts.size());
 		for (int dest : destSauts) {
-			List<DraughtsMove> movesPrisesDest = prisesPossiblesDepuisCase(dest, isKing, square);
-			//System.out.println(square + " " +movesPrisesDest);
+			List<DraughtsMove> movesPrisesDest = new ArrayList<>();
+			if (iteration <10)
+				movesPrisesDest = prisesPossiblesDepuisCase(dest, isKing, square, iteration+1);
 			if (movesPrisesDest.isEmpty()) {
 				DraughtsMove move = new DraughtsMove();
 				move.add(square);
@@ -307,7 +308,7 @@ public class EnglishDraughts extends Game {
 		ArrayList<Move> possibleCaptureMoves = new ArrayList<>();
 		for(int i = 0; i< myPawns().size(); i++) {
 			int current = myPawns().get(i);
-			List<DraughtsMove> possibleCaptures = prisesPossiblesDepuisCase(current, board.isKing(current), -1);
+			List<DraughtsMove> possibleCaptures = prisesPossiblesDepuisCase(current, board.isKing(current), -1, 0);
 			if (!possibleCaptures.isEmpty()) {
 				//System.out.println();
 				possibleCaptureMoves.addAll(possibleCaptures);
@@ -483,10 +484,6 @@ public class EnglishDraughts extends Game {
 	 */
 	@Override
 	public PlayerId winner() {
-		//
-		// TODO implement winner
-		//
-
 		// return the winner ID if possible
 		if (possibleMoves().isEmpty()) {
 			if (playerId == PlayerId.ONE)
@@ -498,7 +495,7 @@ public class EnglishDraughts extends Game {
 		// return PlayerId.NONE if the game is null
 
 		// Return null is the game has not ended yet
-		System.out.println(nbKingMovesWithoutCapture);
+		//System.out.println(nbKingMovesWithoutCapture);
 		return null;
 	}
 }

@@ -313,15 +313,15 @@ public class MonteCarloTreeSearch {
 		List<EvalNode> children = root.children;
 		List<Move> possibleMoves = root.game.possibleMoves();
 		int indexOfBestChildren = -1;
-		double bestScore = 10000000;
+		double bestScore = 0;
 		System.out.println("ROOT POSSEDE " + root.children.size() + " FILS");
 		for(int i = 0; i < children.size() ; i++){
-			if(children.get(i).w <= bestScore) {
-				bestScore = children.get(i).w;
+			if((children.get(i).w/root.n) > bestScore) {
+				bestScore = (children.get(i).w/root.n);
 				indexOfBestChildren = i;
 			}
 		}
-		System.out.println("Le meilleur move est :" + bestScore + " fois gagné" );
+		System.out.println("Le meilleur move est :" + bestScore + " fois gagné");
 		if (indexOfBestChildren < 0) {
 			System.out.println("Erreur getBestMove");
 		}

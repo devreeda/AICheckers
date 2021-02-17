@@ -316,8 +316,9 @@ public class MonteCarloTreeSearch {
 		double bestScore = 0;
 		System.out.println("ROOT POSSEDE " + root.children.size() + " FILS");
 		for(int i = 0; i < children.size() ; i++){
-			if((children.get(i).w/root.n) > bestScore) {
-				bestScore = (children.get(i).w/root.n);
+			System.out.println(i + " : " + possibleMoves.get(i) + " " + children.get(i).w/children.get(i).n );
+			if((children.get(i).w/children.get(i).n) > bestScore) {
+				bestScore = (children.get(i).w/children.get(i).n);
 				indexOfBestChildren = i;
 			}
 		}

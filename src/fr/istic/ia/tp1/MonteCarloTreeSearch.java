@@ -283,12 +283,21 @@ public class MonteCarloTreeSearch {
 		for(int i = 0; i < visited.size(); i++){
 			EvalNode tmp = visited.get(i);
 			//System.out.println(visited.size() + " : " +  i%2);
-			if((i %2) == 0 ) {
-				tmp.w = (int) (tmp.w + rollout.win1);
-				//System.out.println("Victoire du noeud visited :"+visited.get(i).w);
+			if(root.game.player().equals(PlayerId.ONE)) {
+				if ((i % 2) == 0) {
+					tmp.w = (int) (tmp.w + rollout.win1);
+					//System.out.println("Victoire du noeud visited :"+visited.get(i).w);
+				} else {
+					tmp.w = (int) (tmp.w + rollout.win2);
+				}
 			}
 			else {
-				tmp.w = (int) (tmp.w + rollout.win2);
+				if ((i % 2) == 0) {
+					tmp.w = (int) (tmp.w + rollout.win2);
+					//System.out.println("Victoire du noeud visited :"+visited.get(i).w);
+				} else {
+					tmp.w = (int) (tmp.w + rollout.win1);
+				}
 			}
 			tmp.n = (int) (tmp.n + rollout.n);
 			//System.out.println("tmp.n = " + tmp.n);
@@ -313,19 +322,34 @@ public class MonteCarloTreeSearch {
 		List<EvalNode> children = root.children;
 		List<Move> possibleMoves = root.game.possibleMoves();
 		int indexOfBestChildren = -1;
-		double bestScore = 0;
+		double bestScore = 1;
 		System.out.println("ROOT POSSEDE " + root.children.size() + " FILS");
-		for(int i = 0; i < children.size() ; i++){
-			System.out.println(i + " : " + possibleMoves.get(i) + " " + children.get(i).w/children.get(i).n );
-			if((children.get(i).w/children.get(i).n) > bestScore) {
-				bestScore = (children.get(i).w/children.get(i).n);
-				indexOfBestChildren = i;
+		//if(root.game.player().equals(PlayerId.ONE)) {
+			for (int i = 0; i < children.size(); i++) {
+				//System.out.println(i + " : " + possibleMoves.get(i) + " " + children.get(i).w / children.get(i).n);
+				if ((children.get(i).w / children.get(i).n) < bestScore) {
+					bestScore = (children.get(i).w / children.get(i).n);
+					indexOfBestChildren = i;
+				}
+			}
+		//}
+/*
+		else {
+			bestScore = 1;
+			for (int i = 0; i < children.size(); i++) {
+				//System.out.println(i + " : " + possibleMoves.get(i) + " " + children.get(i).w / children.get(i).n);
+				if ((children.get(i).w / children.get(i).n) < bestScore) {
+					bestScore = (children.get(i).w / children.get(i).n);
+					indexOfBestChildren = i;
+				}
 			}
 		}
-		System.out.println("Le meilleur move est :" + bestScore + " fois gagné");
+*/
+
 		if (indexOfBestChildren < 0) {
 			System.out.println("Erreur getBestMove");
 		}
+		if(root.children.size() == 1) indexOfBestChildren = 0;
 		return possibleMoves.get(indexOfBestChildren);
 	}
 	
